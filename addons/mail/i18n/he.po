@@ -445,6 +445,9 @@ msgid ""
 "'=', False), ('composition_mode', '=', 'mass_mail')]}\">Followers of the "
 "document and</span>"
 msgstr ""
+"<span name=\"document_followers_text\" attrs=\"{'invisible':['|', ('model', "
+"'=', False), ('composition_mode', '=', 'mass_mail')]}\">עוקבים אחר המסמך "
+"ו-</span>"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
@@ -3871,7 +3874,7 @@ msgstr "אשף הזמנה"
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_followers__is_active
 msgid "Is Active"
-msgstr ""
+msgstr "האם פעיל"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_mail__is_current_user_or_guest_author
@@ -6501,6 +6504,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail.field_mail_message_schedule__scheduled_datetime
 #: model_terms:ir.ui.view,arch_db:mail.email_template_form
 msgid "Scheduled Send Date"
+msgstr ""
+
+#. module: mail
+#: model_terms:ir.ui.view,arch_db:mail.mail_template_preview_view_form
+msgid "Select a language"
 msgstr ""
 
 #. module: mail

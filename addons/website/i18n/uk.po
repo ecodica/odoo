@@ -3,8 +3,8 @@
 # 	* website
 # 
 # Translators:
-# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022
 # Martin Trigaux, 2022
+# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022
 # 
 msgid ""
 msgstr ""
@@ -12,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-03 16:37+0000\n"
 "PO-Revision-Date: 2022-09-22 05:56+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
+"Last-Translator: Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022\n"
 "Language-Team: Ukrainian (https://www.transifex.com/odoo/teams/41243/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1283,6 +1283,17 @@ msgid "A Chart Title"
 msgstr "Заголовок графіку"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/editor/snippets.options.js:0
+#, python-format
+msgid ""
+"A Google Map error occurred. Make sure to read the key configuration popup "
+"carefully."
+msgstr ""
+"Сталася помилка Google Map. Уважно прочитайте спливаюче вікно конфігурації "
+"ключа."
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_text_image
 msgid "A Section Subtitle"
 msgstr "Секційний підзаголовок"
@@ -1627,8 +1638,11 @@ msgid "After"
 msgstr "Після"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
 #: model_terms:website.page,arch_db:website.bs_debug_page
+#, python-format
 msgid "Alert"
 msgstr "Сповіщення"
 
@@ -2079,8 +2093,11 @@ msgid "Background Shape"
 msgstr "Форма фону"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
 #: model_terms:website.page,arch_db:website.bs_debug_page
+#, python-format
 msgid "Badge"
 msgstr "Значок"
 
@@ -2174,6 +2191,13 @@ msgstr "Блейзери"
 #: model_terms:ir.ui.view,arch_db:website.snippet_options
 msgid "Block"
 msgstr "Блокувати"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Blockquote"
+msgstr "Блок цитат"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_big_icons_subtitles
@@ -2409,8 +2433,11 @@ msgid "Cannot load google map."
 msgstr "Не можна завантажити google-карту."
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
 #: model_terms:website.page,arch_db:website.bs_debug_page
+#, python-format
 msgid "Card"
 msgstr "Картка"
 
@@ -2520,7 +2547,10 @@ msgstr ""
 "скидання всіх ваших налаштувань кольору."
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: model_terms:ir.ui.view,arch_db:website.s_chart_options
+#, python-format
 msgid "Chart"
 msgstr "План"
 
@@ -3921,7 +3951,7 @@ msgstr "Редагувати"
 #: code:addons/website/static/src/services/website_custom_menus.js:0
 #, python-format
 msgid "Edit %s"
-msgstr ""
+msgstr "Редагувати %s"
 
 #. module: website
 #. openerp-web
@@ -4045,6 +4075,13 @@ msgstr "Увімкніть виставлення рахунків у вашом
 #: model:ir.model.fields,help:website.field_ir_model__website_form_access
 msgid "Enable the form builder feature for this model."
 msgstr "Увімкніть функцію розробника форми для цієї моделі."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid "Enable the right google map APIs in your google account"
+msgstr "Увімкніть потрібні API карт Google у своєму обліковому записі Google"
 
 #. module: website
 #. openerp-web
@@ -5454,6 +5491,76 @@ msgid "Inputs"
 msgstr "Вхідні"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a badge snippet."
+msgstr "Вставте сніпет значка."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a blockquote snippet."
+msgstr "Вставте блок цитат."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a card snippet."
+msgstr "Вставте сніпет картки."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a chart snippet."
+msgstr "Вставте сніпет діаграми."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a progress bar snippet."
+msgstr "Вставте сніпет індикатора виконання."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a rating snippet."
+msgstr "Вставте сніпет рейтингу."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a share snippet."
+msgstr "Вставте сніпет поширення."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert a text Highlight snippet."
+msgstr "Вставте сніпет підкреслення тексту."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert an alert snippet."
+msgstr "Вставте сніпет сповіщення."
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Insert an horizontal separator sippet."
+msgstr "Вставте сніпет горизонтального розділення."
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_table_of_content
 msgid ""
 "Insert text styles like headers, bold, italic, lists, and fonts with\n"
@@ -6233,6 +6340,46 @@ msgid "Main page of your website served to visitors"
 msgstr ""
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid "Make sure billing is enabled"
+msgstr "Переконайтеся, що виставлення рахунків увімкнено"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid ""
+"Make sure to wait if errors keep being shown: sometimes enabling an API "
+"allows to use it immediately but Google keeps triggering errors for a while"
+msgstr ""
+"Обов’язково зачекайте, якщо помилки продовжують відображатися: іноді "
+"ввімкнення API дозволяє використовувати його негайно, але Google продовжує "
+"ініціювати помилки деякий час"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid "Make sure your settings are properly configured:"
+msgstr "Переконайтеся, що ваші параметри налаштовано правильно:"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid "Maps JavaScript API"
+msgstr "API карт JavaScript"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid "Maps Static API"
+msgstr "API карт Static"
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_website_form_options
 msgid "Mark Text"
 msgstr "Позначити текст"
@@ -6389,7 +6536,7 @@ msgstr ""
 #: code:addons/website/static/src/js/editor/snippets.options.js:0
 #, python-format
 msgid "Min-Height"
-msgstr ""
+msgstr "Мінімальна висота"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_blockquote_options
@@ -7422,6 +7569,13 @@ msgid "Placeholder"
 msgstr "Заповнювач"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/xml/website.editor.xml:0
+#, python-format
+msgid "Places API"
+msgstr "API місць"
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_countdown_options
 msgid "Plain"
 msgstr "Зрозуміло"
@@ -7617,6 +7771,13 @@ msgid "Profile"
 msgstr "Профіль"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Progress Bar"
+msgstr "Гістограма прогресу"
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_countdown_options
 msgid "Progress Bar Color"
 msgstr "Колір гістограми"
@@ -7739,6 +7900,13 @@ msgstr "Радар"
 #: model_terms:ir.ui.view,arch_db:website.s_website_form_options
 msgid "Radio Buttons"
 msgstr "Перемикачі"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Rating"
+msgstr "Оцінка"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_image_gallery_options
@@ -8317,6 +8485,13 @@ msgid "Separated link"
 msgstr "Окреме посилання"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
+#, python-format
+msgid "Separator"
+msgstr "Роздільник"
+
+#. module: website
 #: model:ir.model.fields,field_description:website.field_theme_ir_asset__sequence
 #: model:ir.model.fields,field_description:website.field_theme_website_menu__sequence
 #: model:ir.model.fields,field_description:website.field_website__sequence
@@ -8332,7 +8507,7 @@ msgstr "Послідовність"
 #: code:addons/website/static/src/xml/website.editor.xml:0
 #, python-format
 msgid "Serve font from Google servers"
-msgstr ""
+msgstr "Подавати шрифт із серверів Google"
 
 #. module: website
 #: model:ir.model,name:website.model_ir_actions_server
@@ -8396,7 +8571,11 @@ msgid "Shake"
 msgstr "Тряска"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: model_terms:ir.ui.view,arch_db:website.s_share
+#: model_terms:ir.ui.view,arch_db:website.template_footer_headline
+#, python-format
 msgid "Share"
 msgstr "Поділитися"
 
@@ -9022,7 +9201,10 @@ msgid "Text Color"
 msgstr "Колір тексту"
 
 #. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: model_terms:ir.ui.view,arch_db:website.s_text_highlight
+#, python-format
 msgid "Text Highlight"
 msgstr "Підкреслення тексту"
 
@@ -9372,7 +9554,7 @@ msgstr ""
 #: code:addons/website/static/src/xml/website.editor.xml:0
 #, python-format
 msgid "This font is hosted and served to your visitors by Google servers"
-msgstr ""
+msgstr "Цей шрифт розміщується та надається відвідувачам на серверах Google"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -10364,6 +10546,16 @@ msgstr "Веб-відвідувачі"
 #. module: website
 #. openerp-web
 #: code:addons/website/static/src/components/fields/redirect_field.xml:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
+#: code:addons/website/static/src/js/menu/edit.js:0
 #: code:addons/website/static/src/xml/website.backend.xml:0
 #: model:ir.actions.act_url,name:website.action_website
 #: model:ir.model,name:website.model_website
@@ -11310,6 +11502,14 @@ msgstr "кладка, сітка"
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "menu, pricing"
 msgstr "меню, ціни"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/snippets/s_website_form/options.js:0
+#: code:addons/website/static/src/xml/website_form_editor.xml:0
+#, python-format
+msgid "no value"
+msgstr "немає значень"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.color_combinations_debug_view
