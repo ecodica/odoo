@@ -362,15 +362,15 @@ export class OdooEditor extends EventTarget {
             // Create the move buttons.
             if (direction === 'column') {
                 uiMenu.append(...parser.parseFromString(`
-                    <div class="o_move_left"><span class="fa fa-chevron-left"></span>Move left</div>
-                    <div class="o_move_right"><span class="fa fa-chevron-right"></span>Move right</div>
+                    <div class="o_move_left"><span class="fa fa-chevron-left"></span>` + this.options._t('Move left') + `</div>
+                    <div class="o_move_right"><span class="fa fa-chevron-right"></span>` + this.options._t('Move right') + `</div>
                 `, 'text/html').body.children);
                 this.addDomListener(uiMenu.querySelector('.o_move_left'), 'click', this._onTableMoveLeftClick);
                 this.addDomListener(uiMenu.querySelector('.o_move_right'), 'click', this._onTableMoveRightClick);
             } else {
                 uiMenu.append(...parser.parseFromString(`
-                    <div class="o_move_up"><span class="fa fa-chevron-left" style="transform: rotate(90deg);"></span>Move up</div>
-                    <div class="o_move_down"><span class="fa fa-chevron-right" style="transform: rotate(90deg);"></span>Move down</div>
+                    <div class="o_move_up"><span class="fa fa-chevron-left" style="transform: rotate(90deg);"></span>` + this.options._t('Move up') + `</div>
+                    <div class="o_move_down"><span class="fa fa-chevron-right" style="transform: rotate(90deg);"></span>` + this.options._t('Move down') + `</div>
                 `, 'text/html').body.children);
                 this.addDomListener(uiMenu.querySelector('.o_move_up'), 'click', this._onTableMoveUpClick);
                 this.addDomListener(uiMenu.querySelector('.o_move_down'), 'click', this._onTableMoveDownClick);
@@ -379,15 +379,15 @@ export class OdooEditor extends EventTarget {
             // Create the add buttons.
             if (direction === 'column') {
                 uiMenu.append(...parser.parseFromString(`
-                    <div class="o_insert_left"><span class="fa fa-plus"></span>Insert left</div>
-                    <div class="o_insert_right"><span class="fa fa-plus"></span>Insert right</div>
+                    <div class="o_insert_left"><span class="fa fa-plus"></span>` + this.options._t('Insert left') + `</div>
+                    <div class="o_insert_right"><span class="fa fa-plus"></span>` + this.options._t('Insert right') +`</div>
                 `, 'text/html').body.children);
                 this.addDomListener(uiMenu.querySelector('.o_insert_left'), 'click', () => this.execCommand('addColumn', 'before', this._columnUiTarget));
                 this.addDomListener(uiMenu.querySelector('.o_insert_right'), 'click', () => this.execCommand('addColumn', 'after', this._columnUiTarget));
             } else {
                 uiMenu.append(...parser.parseFromString(`
-                    <div class="o_insert_above"><span class="fa fa-plus"></span>Insert above</div>
-                    <div class="o_insert_below"><span class="fa fa-plus"></span>Insert below</div>
+                    <div class="o_insert_above"><span class="fa fa-plus"></span>` + this.options._t('Insert above') + `</div>
+                    <div class="o_insert_below"><span class="fa fa-plus"></span>` + this.options._t('Insert below') + `</div>
                 `, 'text/html').body.children);
                 this.addDomListener(uiMenu.querySelector('.o_insert_above'), 'click', () => this.execCommand('addRow', 'before', this._rowUiTarget));
                 this.addDomListener(uiMenu.querySelector('.o_insert_below'), 'click', () => this.execCommand('addRow', 'after', this._rowUiTarget));
@@ -395,10 +395,12 @@ export class OdooEditor extends EventTarget {
 
             // Add the delete button.
             if (direction === 'column') {
-                uiMenu.append(parser.parseFromString(`<div class="o_delete_column"><span class="fa fa-trash"></span>Delete</div>`, 'text/html').body.firstChild)
+                uiMenu.append(parser.parseFromString(`<div class="o_delete_column"><span class="fa fa-trash"></span>` + this.options._t('Delete') + `</div>
+                `, 'text/html').body.firstChild)
                 this.addDomListener(uiMenu.querySelector('.o_delete_column'), 'click', this._onTableDeleteColumnClick);
             } else {
-                uiMenu.append(parser.parseFromString(`<div class="o_delete_row"><span class="fa fa-trash"></span>Delete</div>`, 'text/html').body.firstChild)
+                uiMenu.append(parser.parseFromString(`<div class="o_delete_row"><span class="fa fa-trash"></span>` + this.options._t('Delete') + `</div>
+                `, 'text/html').body.firstChild)
                 this.addDomListener(uiMenu.querySelector('.o_delete_row'), 'click', this._onTableDeleteRowClick);
             }
 
@@ -565,7 +567,7 @@ export class OdooEditor extends EventTarget {
                     },
                 },
                 ...(this.options.commands || []),
-                ...(this.options.commands && !this.options.commands.find(c =>  c.title === this.options._t('Separator')) ? [
+                ...(!this.options.commands || !this.options.commands.find(c =>  c.name === this.options._t('Separator')) ? [
                     {
                         category: this.options._t('Structure'),
                         name: this.options._t('Separator'),
@@ -1674,6 +1676,7 @@ export class OdooEditor extends EventTarget {
         this._stopContenteditable();
 
         this._fixLinkMutatedElements = {
+            link,
             wasContenteditableTrue: [...editableChildren],
             wasContenteditableFalse: [],
             wasContenteditableNull: [],
@@ -1884,7 +1887,7 @@ export class OdooEditor extends EventTarget {
         }
         if (joinWith) {
             const el = closestElement(joinWith);
-            fillEmpty(el);
+            el && fillEmpty(el);
         }
     }
 
@@ -2074,7 +2077,19 @@ export class OdooEditor extends EventTarget {
             }
         }
         if (editorCommands[method]) {
-            return editorCommands[method](this, ...args);
+            // Make sure to restore the content editable before applying an
+            // editor command, as it might have been temporarily disabled for
+            // browser behaviors which should not concern editor commands.
+            const link = this._fixLinkMutatedElements && this._fixLinkMutatedElements.link;
+            if (this._fixLinkMutatedElements) {
+                this.resetContenteditableLink();
+                this._activateContenteditable();
+            }
+            const returnValue = editorCommands[method](this, ...args);
+            if (link) {
+                this.setContenteditableLink(link);
+            }
+            return returnValue;
         }
         if (method.startsWith('justify')) {
             const mode = method.split('justify').join('').toLocaleLowerCase();
@@ -2662,23 +2677,33 @@ export class OdooEditor extends EventTarget {
             }
         }
         const paragraphDropdownButton = this.toolbar.querySelector('#paragraphDropdownButton');
-        for (const commandState of [
-            'justifyLeft',
-            'justifyRight',
-            'justifyCenter',
-            'justifyFull',
-        ]) {
-            const isStateTrue = this.document.queryCommandState(commandState);
-            const button = this.toolbar.querySelector('#' + commandState);
-            if (commandState.startsWith('justify')) {
-                if (paragraphDropdownButton) {
-                    button.classList.toggle('active', isStateTrue);
-                    const direction = commandState.replace('justify', '').toLowerCase();
-                    const newClass = `fa-align-${direction === 'full' ? 'justify' : direction}`;
-                    paragraphDropdownButton.classList.toggle(newClass, isStateTrue);
+        if (paragraphDropdownButton) {
+            for (const commandState of [
+                'justifyLeft',
+                'justifyRight',
+                'justifyCenter',
+                'justifyFull',
+            ]) {
+                const button = this.toolbar.querySelector('#' + commandState);
+                const direction = commandState === 'justifyFull'
+                    ? 'justify' : commandState.replace('justify', '').toLowerCase();
+                let isStateTrue = false;
+                const link = sel.anchorNode && closestElement(sel.anchorNode, 'a');
+                const linkBlock = link && closestBlock(link);
+                if (linkBlock) {
+                    // We don't support links with a width that is larger than
+                    // their contents so an alignment within the link is not
+                    // visible. Since the editor applies alignments to a node's
+                    // closest block, we show the alignment of the link's
+                    // closest block.
+                    const alignment = getComputedStyle(linkBlock).textAlign;
+                    isStateTrue = alignment === direction;
+                } else {
+                    isStateTrue = this.document.queryCommandState(commandState)
                 }
-            } else if (button) {
                 button.classList.toggle('active', isStateTrue);
+                const newClass = `fa-align-${direction}`;
+                paragraphDropdownButton.classList.toggle(newClass, isStateTrue);
             }
         }
         if (sel.rangeCount) {
@@ -3106,7 +3131,9 @@ export class OdooEditor extends EventTarget {
                         const selectionBackup = this._latestComputedSelection;
                         setSelection(selectionBackup.anchorNode, selectionBackup.anchorOffset);
                     }
-                    insertText(selection, ev.data);
+                    // When the spellcheck of Safari modify text, ev.data is
+                    // null and the string can be found within ev.dataTranser.
+                    insertText(selection, ev.data === null ? ev.dataTransfer.getData('text/plain') : ev.data);
                     selection.collapseToEnd();
                 }
                 // Check for url after user insert a space so we won't transform an incomplete url.
@@ -3221,6 +3248,44 @@ export class OdooEditor extends EventTarget {
                 const list = range.commonAncestorContainer.cloneNode();
                 list.replaceChildren(...rangeContent.childNodes);
                 rangeContent = list;
+            }
+            if (rangeContent.firstChild.nodeName === 'TR' || rangeContent.firstChild.nodeName === 'TD') {
+                // We enter this case only if selection is within single table.
+                const table = closestElement(range.commonAncestorContainer, 'table');
+                const tableClone = table.cloneNode(true);
+                // A table is considered fully selected if it is nested inside a
+                // cell that is itself selected, or if all its own cells are
+                // selected.
+                const isTableFullySelected =
+                    table.parentElement && closestElement(table.parentElement, 'td.o_selected_td') ||
+                    [...table.querySelectorAll('td')]
+                        .filter(td => closestElement(td, 'table') === table)
+                        .every(td => td.classList.contains('o_selected_td'));
+                if (!isTableFullySelected(table)) {
+                    for (const td of tableClone.querySelectorAll('td:not(.o_selected_td)')) {
+                        if (closestElement(td, 'table') === tableClone) { // ignore nested
+                            td.remove();
+                        }
+                    }
+                    for (const tr of tableClone.querySelectorAll('tr:not(:has(td))')) {
+                        if (closestElement(tr, 'table') === tableClone) { // ignore nested
+                            tr.remove();
+                        }
+                    }
+                }
+                // If it is fully selected, clone the whole table rather than
+                // just its rows.
+                rangeContent = tableClone;
+            }
+            if (rangeContent.firstChild.nodeName === 'TABLE') {
+                // Make sure the full leading table is copied.
+                rangeContent.firstChild.after(closestElement(range.startContainer, 'table').cloneNode(true));
+                rangeContent.firstChild.remove();
+            }
+            if (rangeContent.lastChild.nodeName === 'TABLE') {
+                // Make sure the full trailing table is copied.
+                rangeContent.lastChild.before(closestElement(range.endContainer, 'table').cloneNode(true));
+                rangeContent.lastChild.remove();
             }
 
             const dataHtmlElement = document.createElement('data');
@@ -3439,9 +3504,14 @@ export class OdooEditor extends EventTarget {
      */
     isSelectionInEditable(selection) {
         selection = selection || this.document.getSelection();
-        return selection && selection.anchorNode &&
-            closestElement(selection.anchorNode).isContentEditable && closestElement(selection.focusNode).isContentEditable &&
-            this.editable.contains(selection.anchorNode) && this.editable.contains(selection.focusNode);
+        if (selection && selection.anchorNode && selection.focusNode) {
+            const anchorElement = closestElement(selection.anchorNode);
+            const focusElement = closestElement(selection.focusNode);
+            return anchorElement && anchorElement.isContentEditable && focusElement && focusElement.isContentEditable &&
+                this.editable.contains(selection.anchorNode) && this.editable.contains(selection.focusNode);
+        } else {
+            return false;
+        }
     }
     /**
      * Returns true if the current selection is in at least one block Element
