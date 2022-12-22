@@ -2146,9 +2146,8 @@ const ListUserValueWidget = UserValueWidget.extend({
             if (this.el.dataset.idMode && this.el.dataset.idMode === "name") {
                 id = el.name;
             }
-            const idInt = parseInt(id);
             return Object.assign({
-                id: isNaN(idInt) ? id : idInt,
+                id: /^-?[0-9]{1,15}$/.test(id) ? parseInt(id) : id,
                 name: el.value,
                 display_name: el.value,
             }, el.dataset);
@@ -2158,8 +2157,7 @@ const ListUserValueWidget = UserValueWidget.extend({
             this.selected = checkboxes.map(el => {
                 const input = el.parentElement.previousSibling.firstChild;
                 const id = input.name || input.value;
-                const idInt = parseInt(id);
-                return isNaN(idInt) ? id : idInt;
+                return /^-?[0-9]{1,15}$/.test(id) ? parseInt(id) : id;
             });
             values.forEach(v => {
                 // Elements not toggleable are considered as always selected.
@@ -4654,24 +4652,35 @@ registry['sizing_x'] = registry.sizing.extend({
      * @override
      */
     _onResize: function (compass, beginClass, current) {
-        if (compass === 'w') {
-            // don't change the right border position when we change the offset (replace col size)
-            var beginCol = Number(beginClass.match(/col-lg-([0-9]+)|$/)[1] || 0);
-            var beginOffset = Number(beginClass.match(/offset-lg-([0-9-]+)|$/)[1] || beginClass.match(/offset-xl-([0-9-]+)|$/)[1] || 0);
-            var offset = Number(this.grid.w[0][current].match(/offset-lg-([0-9-]+)|$/)[1] || 0);
-            if (offset < 0) {
-                offset = 0;
-            }
-            var colSize = beginCol - (offset - beginOffset);
-            if (colSize <= 0) {
-                colSize = 1;
-                offset = beginOffset + beginCol - 1;
-            }
-            this.$target.attr('class', this.$target.attr('class').replace(/\s*(offset-xl-|offset-lg-|col-lg-)([0-9-]+)/g, ''));
+        if (compass === 'w' || compass === 'e') {
+            const beginOffset = Number(beginClass.match(/offset-lg-([0-9-]+)|$/)[1] || beginClass.match(/offset-xl-([0-9-]+)|$/)[1] || 0);
 
-            this.$target.addClass('col-lg-' + (colSize > 12 ? 12 : colSize));
-            if (offset > 0) {
-                this.$target.addClass('offset-lg-' + offset);
+            if (compass === 'w') {
+                // don't change the right border position when we change the offset (replace col size)
+                var beginCol = Number(beginClass.match(/col-lg-([0-9]+)|$/)[1] || 0);
+                var offset = Number(this.grid.w[0][current].match(/offset-lg-([0-9-]+)|$/)[1] || 0);
+                if (offset < 0) {
+                    offset = 0;
+                }
+                var colSize = beginCol - (offset - beginOffset);
+                if (colSize <= 0) {
+                    colSize = 1;
+                    offset = beginOffset + beginCol - 1;
+                }
+                this.$target.attr('class', this.$target.attr('class').replace(/\s*(offset-xl-|offset-lg-|col-lg-)([0-9-]+)/g, ''));
+
+                this.$target.addClass('col-lg-' + (colSize > 12 ? 12 : colSize));
+                if (offset > 0) {
+                    this.$target.addClass('offset-lg-' + offset);
+                }
+            } else if (beginOffset > 0) {
+                const endCol = Number(this.grid.e[0][current].match(/col-lg-([0-9]+)|$/)[1] || 0);
+                // Avoids overflowing the grid to the right if the
+                // column size + the offset exceeds 12.
+                if ((endCol + beginOffset) > 12) {
+                    this.$target[0].className = this.$target[0].className.replace(/\s*(col-lg-)([0-9-]+)/g, '');
+                    this.$target[0].classList.add('col-lg-' + (12 - beginOffset));
+                }
             }
         }
         this._super.apply(this, arguments);
@@ -6607,6 +6616,17 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
     /**
      * @override
      */
+    onBuilt() {
+        this._patchShape(this.$target[0]);
+    },
+
+    //--------------------------------------------------------------------------
+    // Public
+    //--------------------------------------------------------------------------
+
+    /**
+     * @override
+     */
     updateUI() {
         if (this.rerender) {
             this.rerender = false;
@@ -6746,7 +6766,7 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
 
         const shapeContainer = target.querySelector(':scope > .o_we_shape');
         if (shapeContainer) {
-            shapeContainer.remove();
+            this._removeShapeEl(shapeContainer);
         }
         if (newContainer) {
             const preShapeLayerElement = this._getLastPreShapeLayerElement();
@@ -6843,6 +6863,13 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
             this.prevShapeContainer = shapeContainer.cloneNode(true);
             this.prevShape = target.dataset.oeShapeData;
         }
+    },
+    /**
+     * @private
+     * @param {HTMLElement} shapeEl
+     */
+    _removeShapeEl(shapeEl) {
+        shapeEl.remove();
     },
     /**
      * Overwrites shape properties with the specified data.
@@ -6973,6 +7000,22 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
         return _.pick(colors, defaultKeys);
     },
     /**
+     * @todo remove me in master, needed to patch errors on set-up shapes in
+     * themes.
+     *
+     * @param {HTMLElement} el
+     * @returns {Object}
+     */
+    _patchShape(el) {
+        const shapeData = this._getShapeData(el);
+        // Wrong shape data for s_picture in kea theme
+        if (shapeData.shape === 'web_editor/Origins/Wavy_03') {
+            shapeData.shape = 'web_editor/Wavy/03';
+            el.dataset.oeShapeData = JSON.stringify(shapeData);
+        }
+        return shapeData;
+    },
+    /**
      * Toggles whether there is a shape or not, to be called from bg toggler.
      *
      * @private
@@ -6987,11 +7030,17 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
             const possibleShapes = shapeWidget.getMethodsParams('shape').possibleValues;
             let shapeToSelect;
             if (previousSibling) {
-                const previousShape = this._getShapeData(previousSibling).shape;
+                const shapeData = this._patchShape(previousSibling);
+                const previousShape = shapeData.shape;
                 shapeToSelect = possibleShapes.find((shape, i) => {
                     return possibleShapes[i - 1] === previousShape;
                 });
-            } else {
+            }
+            // If there is no previous sibling, if the previous sibling had the
+            // last shape selected or if the previous shape could not be found
+            // in the possible shapes, default to the first shape. ([0] being no
+            // shapes selected.)
+            if (!shapeToSelect) {
                 shapeToSelect = possibleShapes[1];
             }
             this.trigger_up('snippet_edition_request', {exec: () => {
@@ -7603,6 +7652,20 @@ registry.SnippetSave = SnippetOptionWidget.extend({
                 ]
             });
         });
+    },
+
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+     * TODO adapt in master, this option should only be instantiated for real
+     * snippets in the first place.
+     *
+     * @override
+     */
+    _computeVisibility() {
+        return this.$target[0].hasAttribute('data-snippet');
     },
 });
 

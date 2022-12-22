@@ -13,6 +13,7 @@ import './commands/align.js';
 import { sanitize } from './utils/sanitize.js';
 import { serializeNode, unserializeNode, serializeSelection } from './utils/serialize.js';
 import {
+    isMacOS,
     closestBlock,
     commonParentGet,
     containsUnremovable,
@@ -33,6 +34,7 @@ import {
     toggleClass,
     closestElement,
     isVisible,
+    isHtmlContentSupported,
     rgbToHex,
     isFontAwesome,
     getInSelection,
@@ -236,6 +238,7 @@ export class OdooEditor extends EventTarget {
                 _t: string => string,
                 allowCommandVideo: true,
                 renderingClasses: [],
+                allowInlineAtRoot: false,
             },
             options,
         );
@@ -3323,7 +3326,7 @@ export class OdooEditor extends EventTarget {
         // is a non-empty Unicode character string containing the printable
         // representation of the key. In this case, call `deleteRange` before
         // inserting the printed representation of the character.
-        if (/^.$/u.test(ev.key) && !ev.ctrlKey && !ev.metaKey) {
+        if (/^.$/u.test(ev.key) && !ev.ctrlKey && !ev.metaKey && (isMacOS() || !ev.altKey)) {
             const selection = this.document.getSelection();
             if (selection && !selection.isCollapsed) {
                 this.deleteRange(selection);
@@ -3601,7 +3604,7 @@ export class OdooEditor extends EventTarget {
         const orphanInlineChildNodes = [...element.childNodes].find(
             (n) => !isBlock(n) && (n.nodeType === Node.ELEMENT_NODE || n.textContent.trim() !== "")
         );
-        if (orphanInlineChildNodes) {
+        if (orphanInlineChildNodes && !this.options.allowInlineAtRoot) {
             const childNodes = [...element.childNodes];
             const tempEl = document.createElement('temp-container');
             let currentP = document.createElement('p');
@@ -3758,7 +3761,8 @@ export class OdooEditor extends EventTarget {
         }
 
         // placeholder hint
-        if (this.editable.textContent === '' && this.options.placeholder && this.editable.firstChild && this.editable.firstChild.innerHTML) {
+        const sel = this.document.getSelection();
+        if (this.editable.textContent.trim() === '' && this.options.placeholder && this.editable.firstChild && this.editable.firstChild.innerHTML && !this.editable.contains(sel.focusNode)) {
             this._makeHint(this.editable.firstChild, this.options.placeholder, true);
         }
     }
@@ -3957,6 +3961,7 @@ export class OdooEditor extends EventTarget {
                     star.classList.toggle('fa-star-o', true);
                     star.classList.toggle('fa-star', false);
                 };
+                this.historyStep();
             }
         }
 
@@ -4126,7 +4131,8 @@ export class OdooEditor extends EventTarget {
         const files = getImageFiles(ev.clipboardData);
         const odooEditorHtml = ev.clipboardData.getData('text/odoo-editor');
         const clipboardHtml = ev.clipboardData.getData('text/html');
-        if (odooEditorHtml) {
+        const targetSupportsHtmlContent = isHtmlContentSupported(sel.anchorNode);
+        if (odooEditorHtml && targetSupportsHtmlContent) {
             const fragment = parseHTML(odooEditorHtml);
 
             // DOMPurify.sanitize remove an attribute that contains a ">" for
@@ -4145,9 +4151,9 @@ export class OdooEditor extends EventTarget {
             if (fragment.hasChildNodes()) {
                 this.execCommand('insert', fragment);
             }
-        } else if (files.length) {
+        } else if (files.length && targetSupportsHtmlContent) {
             this.addImagesFiles(files).then(html => this.execCommand('insert', this._prepareClipboardData(html)));
-        } else if (clipboardHtml) {
+        } else if (clipboardHtml && targetSupportsHtmlContent) {
             this.execCommand('insert', this._prepareClipboardData(clipboardHtml));
         } else {
             const text = ev.clipboardData.getData('text/plain');
@@ -4326,7 +4332,9 @@ export class OdooEditor extends EventTarget {
      */
     _onDrop(ev) {
         ev.preventDefault();
-
+        if (!isHtmlContentSupported(ev.target)) {
+            return;
+        }
         const sel = this.document.getSelection();
         let isInEditor = false;
         let ancestor = sel.anchorNode;
