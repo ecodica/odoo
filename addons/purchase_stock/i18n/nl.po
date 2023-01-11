@@ -883,10 +883,9 @@ msgstr ""
 #, python-format
 msgid ""
 "When products are needed in <b>%s</b>, <br/> a request for quotation is "
-"created to fulfill the need."
+"created to fulfill the need.<br/>Note: This rule will be used in combination"
+" with the rules<br/>of the reception route(s)"
 msgstr ""
-"Wanneer producten benodigd zijn in <b>%s</b>, <br/> wordt een "
-"inkooporderaanvraag aangemaakt om dit mogelijk te maken."
 
 #. module: purchase_stock
 #. odoo-python
@@ -904,7 +903,7 @@ msgstr ""
 #: code:addons/purchase_stock/models/purchase.py:0
 #, python-format
 msgid "You must set a Vendor Location for this partner %s"
-msgstr "Stel een leverancierslocatie in voor deze relatie %s"
+msgstr "Stel een leverancierslocatie in voor deze partner %s"
 
 #. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.res_config_settings_view_form_stock
