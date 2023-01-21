@@ -1110,7 +1110,7 @@ class Task(models.Model):
         ('normal', 'In Progress'),
         ('done', 'Ready'),
         ('blocked', 'Blocked')], string='Status',
-        copy=False, default='normal', required=True)
+        copy=False, default='normal', required=True, compute='_compute_kanban_state', readonly=False, store=True)
     kanban_state_label = fields.Char(compute='_compute_kanban_state_label', string='Kanban State Label', tracking=True, task_dependency_tracking=True)
     create_date = fields.Datetime("Created On", readonly=True)
     write_date = fields.Datetime("Last Updated On", readonly=True)
@@ -1368,6 +1368,10 @@ class Task(models.Model):
             for node in arch.xpath("//filter[@name='message_needaction']"):
                 node.set('invisible', '1')
         return arch, view
+
+    @api.depends('stage_id', 'project_id')
+    def _compute_kanban_state(self):
+        self.kanban_state = 'normal'
 
     @api.depends('parent_id.ancestor_id')
     def _compute_ancestor_id(self):
@@ -2057,9 +2061,6 @@ class Task(models.Model):
 
             vals.update(self.update_date_end(vals['stage_id']))
             vals['date_last_stage_update'] = now
-            # reset kanban state when changing stage
-            if 'kanban_state' not in vals:
-                vals['kanban_state'] = 'normal'
         task_ids_without_user_set = set()
         if 'user_ids' in vals and 'date_assign' not in vals:
             # prepare update of date_assign after super call
@@ -2161,6 +2162,8 @@ class Task(models.Model):
 
     @api.depends('parent_id.project_id', 'display_project_id')
     def _compute_project_id(self):
+        # Avoid recomputing kanban_state
+        self.env.remove_to_compute(self._fields['kanban_state'], self)
         for task in self:
             if task.parent_id:
                 task.project_id = task.display_project_id or task.parent_id.project_id
