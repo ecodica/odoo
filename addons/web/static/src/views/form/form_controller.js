@@ -98,6 +98,7 @@ export class FormController extends Component {
         this.ui = useService("ui");
         this.state = useState({
             isDisabled: false,
+            fieldIsDirty: false,
         });
         useBus(this.ui.bus, "resize", this.render);
 
@@ -153,9 +154,9 @@ export class FormController extends Component {
         // enable the archive feature in Actions menu only if the active field is in the view
         this.archiveEnabled =
             "active" in activeFields
-                ? !activeFields.active.readonly
+                ? !this.props.fields.active.readonly
                 : "x_active" in activeFields
-                ? !activeFields.x_active.readonly
+                ? !this.props.fields.x_active.readonly
                 : false;
 
         // select footers that are not in subviews and move them to another arch
@@ -365,6 +366,10 @@ export class FormController extends Component {
 
     enableButtons() {
         this.state.isDisabled = false;
+    }
+
+    setFieldAsDirty(dirty) {
+        this.state.fieldIsDirty = dirty;
     }
 
     async beforeExecuteActionButton(clickParams) {

@@ -83,7 +83,13 @@ class SaleOrderLine(models.Model):
         domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     product_template_id = fields.Many2one(
         string="Product Template",
-        related='product_id.product_tmpl_id',
+        comodel_name='product.template',
+        compute='_compute_product_template_id',
+        readonly=False,
+        search='_search_product_template_id',
+        # previously related='product_id.product_tmpl_id'
+        # not anymore since the field must be considered editable for product configurator logic
+        # without modifying the related product_id when updated.
         domain=[('sale_ok', '=', True)])
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', depends=['product_id'])
 
@@ -258,6 +264,14 @@ class SaleOrderLine(models.Model):
         compute='_compute_product_uom_readonly')
 
     #=== COMPUTE METHODS ===#
+
+    @api.depends('product_id')
+    def _compute_product_template_id(self):
+        for line in self:
+            line.product_template_id = line.product_id.product_tmpl_id
+
+    def _search_product_template_id(self, operator, value):
+        return [('product_id.product_tmpl_id', operator, value)]
 
     @api.depends('product_id')
     def _compute_custom_attribute_values(self):
@@ -983,13 +997,18 @@ class SaleOrderLine(models.Model):
         protected_fields = self._get_protected_fields()
         if 'done' in self.mapped('state') and any(f in values.keys() for f in protected_fields):
             protected_fields_modified = list(set(protected_fields) & set(values.keys()))
-            fields = self.env['ir.model.fields'].search([
+
+            if 'name' in protected_fields_modified and all(self.mapped('is_downpayment')):
+                protected_fields_modified.remove('name')
+
+            fields = self.env['ir.model.fields'].sudo().search([
                 ('name', 'in', protected_fields_modified), ('model', '=', self._name)
             ])
-            raise UserError(
-                _('It is forbidden to modify the following fields in a locked order:\n%s')
-                % '\n'.join(fields.mapped('field_description'))
-            )
+            if fields:
+                raise UserError(
+                    _('It is forbidden to modify the following fields in a locked order:\n%s')
+                    % '\n'.join(fields.mapped('field_description'))
+                )
 
         result = super().write(values)
 

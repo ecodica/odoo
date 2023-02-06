@@ -1745,6 +1745,11 @@
 
     // Special key to subscribe to, to be notified of key creation/deletion
     const KEYCHANGES = Symbol("Key changes");
+    // Used to specify the absence of a callback, can be used as WeakMap key but
+    // should only be used as a sentinel value and never called.
+    const NO_CALLBACK = () => {
+        throw new Error("Called NO_CALLBACK. Owl is broken, please report this to the maintainers.");
+    };
     const objectToString = Object.prototype.toString;
     const objectHasOwnProperty = Object.prototype.hasOwnProperty;
     const SUPPORTED_RAW_TYPES = new Set(["Object", "Array", "Set", "Map", "WeakMap"]);
@@ -1814,6 +1819,9 @@
      * @param callback the function to call when the key changes
      */
     function observeTargetKey(target, key, callback) {
+        if (callback === NO_CALLBACK) {
+            return;
+        }
         if (!targetToKeysToCallbacks.get(target)) {
             targetToKeysToCallbacks.set(target, new Map());
         }
@@ -1867,8 +1875,11 @@
             if (!observedKeys) {
                 continue;
             }
-            for (const callbacks of observedKeys.values()) {
+            for (const [key, callbacks] of observedKeys.entries()) {
                 callbacks.delete(callback);
+                if (!callbacks.size) {
+                    observedKeys.delete(key);
+                }
             }
         }
         targetsToClear.clear();
@@ -1913,7 +1924,7 @@
      *  reactive has changed
      * @returns a proxy that tracks changes to it
      */
-    function reactive(target, callback = () => { }) {
+    function reactive(target, callback = NO_CALLBACK) {
         if (!canBeMadeReactive(target)) {
             throw new OwlError(`Cannot make the given value reactive`);
         }
@@ -4018,7 +4029,15 @@
                 const fullExpression = `${bExprId}[${exprId}]`;
                 let idx;
                 if (specialInitTargetAttr) {
-                    idx = block.insertData(`${fullExpression} === '${attrs[targetAttr]}'`, "attr");
+                    let targetExpr = targetAttr in attrs && `'${attrs[targetAttr]}'`;
+                    if (!targetExpr && ast.attrs) {
+                        // look at the dynamic attribute counterpart
+                        const dynamicTgExpr = ast.attrs[`t-att-${targetAttr}`];
+                        if (dynamicTgExpr) {
+                            targetExpr = compileExpr(dynamicTgExpr);
+                        }
+                    }
+                    idx = block.insertData(`${fullExpression} === ${targetExpr}`, "attr");
                     attrs[`block-attribute-${idx}`] = specialInitTargetAttr;
                 }
                 else if (hasDynamicChildren) {
@@ -5556,12 +5575,16 @@
 This is not suitable for production use.
 See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration for more information.`;
     };
+    window.__OWL_DEVTOOLS__ || (window.__OWL_DEVTOOLS__ = {
+        apps: new Set(),
+    });
     class App extends TemplateSet {
         constructor(Root, config = {}) {
             super(config);
             this.scheduler = new Scheduler();
             this.root = null;
             this.Root = Root;
+            window.__OWL_DEVTOOLS__.apps.add(this);
             if (config.test) {
                 this.dev = true;
             }
@@ -5618,6 +5641,7 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
                 this.scheduler.flush();
                 this.root.destroy();
             }
+            window.__OWL_DEVTOOLS__.apps.delete(this);
         }
         createComponent(name, isStatic, hasSlotsProp, hasDynamicPropList, hasNoProp) {
             const isDynamic = !isStatic;
@@ -5858,9 +5882,9 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
     Object.defineProperty(exports, '__esModule', { value: true });
 
 
-    __info__.version = '2.0.3';
-    __info__.date = '2023-01-12T15:32:52.837Z';
-    __info__.hash = '316eb06';
+    __info__.version = '2.0.5';
+    __info__.date = '2023-01-27T14:29:31.753Z';
+    __info__.hash = 'ea5d2be';
     __info__.url = 'https://github.com/odoo/owl';
 
 

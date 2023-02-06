@@ -114,7 +114,7 @@ class StockMoveLine(models.Model):
             if not line.location_id:
                 line.location_id = line.move_id.location_id or line.picking_id.location_id
             if not line.location_dest_id:
-                line.location_dest_id = line.move_id.location_dest_id or line.picking_id.location_id
+                line.location_dest_id = line.move_id.location_dest_id or line.picking_id.location_dest_id
 
     def _search_picking_type_id(self, operator, value):
         return [('picking_id.picking_type_id', operator, value)]
@@ -844,6 +844,7 @@ class StockMoveLine(models.Model):
             'picking_type_id': self.picking_id.picking_type_id.id,
             'restrict_partner_id': self.picking_id.owner_id.id,
             'company_id': self.picking_id.company_id.id,
+            'partner_id': self.picking_id.partner_id.id,
         }
 
     def action_open_reference(self):
