@@ -148,7 +148,7 @@ def _convert_column(cr, tablename, columnname, columntype, using):
     except psycopg2.NotSupportedError:
         drop_depending_views(cr, tablename, columnname)
         cr.execute(query)
-    _schema.debug("Table %r: column %r changed to type %s", tablename, columnname, columntype)
+    _schema.warning("Table %r: column %r changed to type %s", tablename, columnname, columntype)
 
 def drop_depending_views(cr, table, column):
     """drop views depending on a field to allow the ORM to resize it in-place"""
