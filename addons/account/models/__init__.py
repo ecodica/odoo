@@ -35,3 +35,4 @@ from . import ir_actions_report
 from . import res_currency
 from . import mail_thread
 from . import account_report
+from . import account_multilang
