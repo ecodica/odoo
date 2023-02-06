@@ -472,6 +472,10 @@ def get_modules():
             _logger.warning("addons path does not exist: %s", ad)
             continue
         plist.extend(listdir(ad))
+    # Log dupicate modules
+    duplicates = set([x for x in plist if plist.count(x) > 1])
+    if duplicates:
+        _logger.warning("Duplicate Modules: %s ", duplicates)
     return list(set(plist))
 
 def get_modules_with_version():
