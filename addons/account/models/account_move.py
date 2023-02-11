@@ -771,6 +771,8 @@ class AccountMove(models.Model):
                 move.invoice_payment_term_id = move.partner_id.property_payment_term_id
             elif move.is_purchase_document(include_receipts=True) and move.partner_id.property_supplier_payment_term_id:
                 move.invoice_payment_term_id = move.partner_id.property_supplier_payment_term_id
+            else:
+                move.invoice_payment_term_id = False
 
     @api.depends('needed_terms')
     def _compute_invoice_date_due(self):
@@ -1269,7 +1271,7 @@ class AccountMove(models.Model):
     @api.depends('currency_id')
     def _compute_display_inactive_currency_warning(self):
         for move in self.with_context(active_test=False):
-            move.display_inactive_currency_warning = not move.currency_id.active
+            move.display_inactive_currency_warning = move.currency_id and not move.currency_id.active
 
     @api.depends('company_id.account_fiscal_country_id', 'fiscal_position_id', 'fiscal_position_id.country_id', 'fiscal_position_id.foreign_vat')
     def _compute_tax_country_id(self):
@@ -3569,8 +3571,31 @@ class AccountMove(models.Model):
             move.to_check = False
 
     def button_draft(self):
+        exchange_move_ids = set()
+        if self:
+            self.env['account.full.reconcile'].flush_model(['exchange_move_id'])
+            self.env['account.partial.reconcile'].flush_model(['exchange_move_id'])
+            self._cr.execute(
+                """
+                    SELECT DISTINCT sub.exchange_move_id
+                    FROM (
+                        SELECT exchange_move_id
+                        FROM account_full_reconcile
+                        WHERE exchange_move_id IN %s
+
+                        UNION ALL
+
+                        SELECT exchange_move_id
+                        FROM account_partial_reconcile
+                        WHERE exchange_move_id IN %s
+                    ) AS sub
+                """,
+                [tuple(self.ids), tuple(self.ids)],
+            )
+            exchange_move_ids = set([row[0] for row in self._cr.fetchall()])
+
         for move in self:
-            if move in move.line_ids.mapped('full_reconcile_id.exchange_move_id'):
+            if move.id in exchange_move_ids:
                 raise UserError(_('You cannot reset to draft an exchange difference journal entry.'))
             if move.tax_cash_basis_rec_id or move.tax_cash_basis_origin_move_id:
                 # If the reconciliation was undone, move.tax_cash_basis_rec_id will be empty;
