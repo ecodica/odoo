@@ -21794,7 +21794,7 @@ msgid ""
 "If set to true, the action will not be displayed on the right toolbar of a "
 "form view."
 msgstr ""
-"Si défini sur true, l'action ne sera pas affichée dans la barre d'outil à "
+"Si défini sur vrai, l'action ne sera pas affichée dans la barre d'outil à "
 "droite de la vue formulaire."
 
 #. module: base
@@ -21850,8 +21850,8 @@ msgid ""
 "         "
 msgstr ""
 "Indique cette vue est héritée,\n"
-"* Si True, la vue étend toujours son parent\n"
-"* Si False, la vue n'étend pas son parent, mais elle peut être activée"
+"* Si vrai, la vue étend toujours son parent\n"
+"* Si faux, la vue n'étend pas son parent, mais elle peut être activée"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_rule_form
@@ -35175,12 +35175,12 @@ msgstr "Modèle transitoire"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodeloverview
 msgid "Transient: False"
-msgstr "Transitoire : False"
+msgstr "Transitoire : Faux"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodeloverview
 msgid "Transient: True"
-msgstr "Transitoire : True"
+msgstr "Transitoire : Vrai"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_groups__trans_implied_ids
@@ -37726,7 +37726,7 @@ msgstr "id externe"
 #: code:addons/base/models/ir_fields.py:0
 #, python-format
 msgid "false"
-msgstr "false"
+msgstr "faux"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__ttype__float
@@ -38142,7 +38142,7 @@ msgstr "titre"
 #: code:addons/base/models/ir_fields.py:0
 #, python-format
 msgid "true"
-msgstr "true"
+msgstr "vrai"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_website_sale_delivery_mondialrelay
