@@ -320,7 +320,7 @@ class HolidaysRequest(models.Model):
     @api.depends('employee_id', 'employee_ids')
     def _compute_all_employees(self):
         for leave in self:
-            leave.all_employee_ids = leave.employee_id | leave.employee_ids
+            leave.all_employee_ids = leave.employee_id | leave.sudo().employee_ids
 
     @api.constrains('holiday_status_id', 'number_of_days')
     def _check_allocation_duration(self):
