@@ -158,7 +158,15 @@ var SnippetEditor = Widget.extend({
     init: function (parent, target, templateOptions, $editable, options) {
         this._super.apply(this, arguments);
         this.options = options;
-        this.$editable = $editable;
+        // This is possible to have a snippet editor not inside an editable area
+        // (data-no-check="true") and it is possible to not have editable areas
+        // at all (restricted editor), in that case we just suppose this is the
+        // body so related code can still be executed without crash (as we still
+        // need to instantiate instances of editors even if nothing is really
+        // editable (data-no-check="true" / navigation options / ...)).
+        // TODO this should probably be reviewed in master: do we need a
+        // reference to the editable area? There should be workarounds.
+        this.$editable = $editable && $editable.length ? $editable : $(document.body);
         this.ownerDocument = this.$editable[0].ownerDocument;
         this.$body = $(this.ownerDocument.body);
         this.$target = $(target);
@@ -1207,7 +1215,9 @@ var SnippetEditor = Widget.extend({
                     // If the column doesn't come from a grid mode snippet.
                     if (!self.$target[0].classList.contains('o_grid_item')) {
                         // Converting the column to grid.
+                        self.options.wysiwyg.odooEditor.observerActive('dragAndDropMoveSnippet');
                         const spans = gridUtils._convertColumnToGrid(rowEl, self.$target[0], self.dragState.columnWidth, self.dragState.columnHeight);
+                        self.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
                         columnColCount = spans.columnColCount;
                         columnRowCount = spans.columnRowCount;
 
@@ -1353,8 +1363,10 @@ var SnippetEditor = Widget.extend({
             this.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
         } else if (this.$target[0].classList.contains('o_grid_item') && this.dropped) {
             // Case when dropping a grid item in a non-grid dropzone.
-            this.$target[0].classList.remove('o_grid_item', 'o_grid_item_image', 'o_grid_item_image_contain');
             this.options.wysiwyg.odooEditor.observerActive('dragAndDropMoveSnippet');
+            const gridSizeClasses = this.$target[0].className.match(/(g-col-lg|g-height)-[0-9]+/g);
+            this.$target[0].classList.remove('o_grid_item', 'o_grid_item_image', 'o_grid_item_image_contain', ...gridSizeClasses);
+            this.$target[0].style.removeProperty('z-index');
             this.$target[0].style.removeProperty('grid-area');
             this.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
         }
@@ -1375,7 +1387,9 @@ var SnippetEditor = Widget.extend({
                     // If the column doesn't come from a snippet in grid mode,
                     // convert it.
                     if (!this.$target[0].classList.contains('o_grid_item')) {
+                        this.options.wysiwyg.odooEditor.observerActive('dragAndDropMoveSnippet');
                         const spans = gridUtils._convertColumnToGrid(rowEl, this.$target[0], this.dragState.columnWidth, this.dragState.columnHeight);
+                        this.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
                         this.dragState.columnColCount = spans.columnColCount;
                         this.dragState.columnRowCount = spans.columnRowCount;
                     }
@@ -1383,7 +1397,7 @@ var SnippetEditor = Widget.extend({
                     // Placing it in the top left corner.
                     this.options.wysiwyg.odooEditor.observerActive('dragAndDropMoveSnippet');
                     this.$target[0].style.gridArea = `1 / 1 / ${1 + this.dragState.columnRowCount} / ${1 + this.dragState.columnColCount}`;
-                    const rowCount = Math.max(rowEl.dataset.rowCount, 1 + this.dragState.columnRowCount);
+                    const rowCount = Math.max(rowEl.dataset.rowCount, this.dragState.columnRowCount);
                     rowEl.dataset.rowCount = rowCount;
                     this.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
 
@@ -1397,8 +1411,9 @@ var SnippetEditor = Widget.extend({
                     if (this.$target[0].classList.contains('o_grid_item')) {
                         // Case when a grid column is dropped near a non-grid
                         // dropzone.
-                        this.$target[0].classList.remove('o_grid_item', 'o_grid_item_image', 'o_grid_item_image_contain');
                         this.options.wysiwyg.odooEditor.observerActive('dragAndDropMoveSnippet');
+                        const gridSizeClasses = this.$target[0].className.match(/(g-col-lg|g-height)-[0-9]+/g);
+                        this.$target[0].classList.remove('o_grid_item', 'o_grid_item_image', 'o_grid_item_image_contain', ...gridSizeClasses);
                         this.$target[0].style.removeProperty('z-index');
                         this.$target[0].style.removeProperty('grid-area');
                         this.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
@@ -1407,6 +1422,14 @@ var SnippetEditor = Widget.extend({
 
                 this.dropped = true;
             }
+        }
+
+        // Resize the grid from where the column came from (if any), as it may
+        // have not been resized if the column did not go over it.
+        if (this.dragState.startingGrid) {
+            this.options.wysiwyg.odooEditor.observerActive('dragAndDropMoveSnippet');
+            gridUtils._resizeGrid(this.dragState.startingGrid);
+            this.options.wysiwyg.odooEditor.observerUnactive('dragAndDropMoveSnippet');
         }
 
         this.$dropZones.droppable('destroy');
@@ -3150,6 +3173,7 @@ var SnippetsMenu = Widget.extend({
         const smoothScrollOptions = this._getScrollOptions({
             jQueryDraggableOptions: {
                 handle: '.oe_snippet_thumbnail:not(.o_we_already_dragging)',
+                cancel: '.oe_snippet.o_disabled',
                 helper: function () {
                     const dragSnip = this.cloneNode(true);
                     dragSnip.querySelectorAll('.o_delete_btn, .o_rename_btn').forEach(
@@ -3690,7 +3714,7 @@ var SnippetsMenu = Widget.extend({
             $content: $('<div/>', {text: _.str.sprintf(_t("Do you want to install the %s App?"), name)}).append(
                 $('<a/>', {
                     target: '_blank',
-                    href: '/web#id=' + moduleID + '&view_type=form&model=ir.module.module&action=base.open_module_tree',
+                    href: '/web#id=' + encodeURIComponent(moduleID) + '&view_type=form&model=ir.module.module&action=base.open_module_tree',
                     text: _t("More info about this app."),
                     class: 'ml4',
                 })
