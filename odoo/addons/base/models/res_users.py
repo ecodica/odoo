@@ -585,7 +585,14 @@ class Users(models.Model):
         for user in users:
             # if partner is global we keep it that way
             if user.partner_id.company_id:
-                user.partner_id.company_id = user.company_id
+                # AKRETION HACK: if you have a multi-company setup where
+                # partners are NOT shared between companies, having
+                # company_id=False on partners related to users
+                # avoids a lot of trouble (you should also disable 'read'
+                # on the ir.rule 'user rule' (XMLID base.res_users_rule)
+
+                # user.partner_id.company_id = user.company_id
+                user.partner_id.write({'company_id': False})
             user.partner_id.active = user.active
         return users
 

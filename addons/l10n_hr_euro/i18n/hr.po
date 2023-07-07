@@ -2752,7 +2752,7 @@ msgstr "Kratkoročne obveze iz nabava i potpora"
 #. module: l10n_hr
 #: model:account.account,name:l10n_hr.1_l10n_hr_chart_template_liquidity_transfer
 #: model:account.account,name:l10n_hr.2_l10n_hr_chart_template_liquidity_transfer
-#: model:account.account.template,name:Liquidity Transferl10n_hr.l10n_hr_chart_template_liquidity_transfer
+#: model:account.account.template,name:l10n_hr.l10n_hr_chart_template_liquidity_transfer
 msgid "Liquidity Transfer"
 msgstr "Prijenos likvidnosti"
 
