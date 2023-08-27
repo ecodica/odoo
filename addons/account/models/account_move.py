@@ -285,7 +285,7 @@ class AccountMove(models.Model):
         states={'posted': [('readonly', True)], 'cancel': [('readonly', True)]},
         check_company=True,
     )
-    needed_terms = fields.Binary(compute='_compute_needed_terms')
+    needed_terms = fields.Binary(compute='_compute_needed_terms', exportable=False)
     needed_terms_dirty = fields.Boolean(compute='_compute_needed_terms')
 
     # === Partner fields === #
@@ -478,7 +478,7 @@ class AccountMove(models.Model):
         help='Use this field to encode the total amount of the invoice.\n'
              'Odoo will automatically create one invoice line with default values to match it.',
     )
-    quick_encoding_vals = fields.Binary(compute='_compute_quick_encoding_vals')
+    quick_encoding_vals = fields.Binary(compute='_compute_quick_encoding_vals', exportable=False)
 
     # === Misc Information === #
     narration = fields.Html(
@@ -548,7 +548,7 @@ class AccountMove(models.Model):
     duplicated_ref_ids = fields.Many2many(comodel_name='account.move', compute='_compute_duplicated_ref_ids')
 
     # used to display the various dates and amount dues on the invoice's PDF
-    payment_term_details = fields.Binary(compute="_compute_payment_term_details")
+    payment_term_details = fields.Binary(compute="_compute_payment_term_details", exportable=False)
     show_payment_term_details = fields.Boolean(compute="_compute_show_payment_term_details")
     show_discount_details = fields.Boolean(compute="_compute_show_payment_term_details")
 
@@ -613,8 +613,17 @@ class AccountMove(models.Model):
 
     @api.depends('move_type')
     def _compute_journal_id(self):
-        for record in self:
+        for record in self.filtered(lambda r: r.journal_id.type not in r._get_valid_journal_types()):
             record.journal_id = record._search_default_journal()
+
+    def _get_valid_journal_types(self):
+        if self.is_sale_document(include_receipts=True):
+            return ['sale']
+        elif self.is_purchase_document(include_receipts=True):
+            return ['purchase']
+        elif self.payment_id or self.env.context.get('is_payment'):
+            return ['bank', 'cash']
+        return ['general']
 
     def _search_default_journal(self):
         if self.payment_id and self.payment_id.journal_id:
@@ -624,15 +633,7 @@ class AccountMove(models.Model):
         if self.statement_line_ids.statement_id.journal_id:
             return self.statement_line_ids.statement_id.journal_id[:1]
 
-        if self.is_sale_document(include_receipts=True):
-            journal_types = ['sale']
-        elif self.is_purchase_document(include_receipts=True):
-            journal_types = ['purchase']
-        elif self.payment_id or self.env.context.get('is_payment'):
-            journal_types = ['bank', 'cash']
-        else:
-            journal_types = ['general']
-
+        journal_types = self._get_valid_journal_types()
         company_id = (self.company_id or self.env.company).id
         domain = [('company_id', '=', company_id), ('type', 'in', journal_types)]
 
@@ -2199,6 +2200,13 @@ class AccountMove(models.Model):
     # LOW-LEVEL METHODS
     # -------------------------------------------------------------------------
 
+    def check_field_access_rights(self, operation, field_names):
+        result = super().check_field_access_rights(operation, field_names)
+        if not field_names:
+            weirdos = ['needed_terms', 'quick_encoding_vals', 'payment_term_details']
+            result = [fname for fname in result if fname not in weirdos]
+        return result
+
     def copy_data(self, default=None):
         data_list = super().copy_data(default)
         for move, data in zip(self, data_list):
@@ -3498,6 +3506,13 @@ class AccountMove(models.Model):
                 customer_count[invoice.partner_id] += 1
             elif invoice.is_purchase_document():
                 supplier_count[invoice.partner_id] += 1
+            elif invoice.move_type == 'entry':
+                sale_amls = invoice.line_ids.filtered(lambda line: line.partner_id and line.account_id.account_type == 'asset_receivable')
+                for partner in sale_amls.mapped('partner_id'):
+                    customer_count[partner] += 1
+                purchase_amls = invoice.line_ids.filtered(lambda line: line.partner_id and line.account_id.account_type == 'liability_payable')
+                for partner in purchase_amls.mapped('partner_id'):
+                    supplier_count[partner] += 1
         for partner, count in customer_count.items():
             (partner | partner.commercial_partner_id)._increase_rank('customer_rank', count)
         for partner, count in supplier_count.items():
@@ -3834,8 +3849,23 @@ class AccountMove(models.Model):
             ('state', '=', 'draft'),
             ('date', '<=', fields.Date.context_today(self)),
             ('auto_post', '!=', 'no'),
+            ('to_check', '=', False),
         ], limit=100)
-        records._post()
+
+        for ids in self._cr.split_for_in_conditions(records.ids, size=100):
+            moves = self.browse(ids)
+            try:  # try posting in batch
+                with self.env.cr.savepoint():
+                    moves._post()
+            except UserError:  # if at least one move cannot be posted, handle moves one by one
+                for move in moves:
+                    try:
+                        with self.env.cr.savepoint():
+                            move._post()
+                    except UserError as e:
+                        move.to_check = True
+                        msg = _('The move could not be posted for the following reason: %(error_message)s', error_message=e)
+                        move.message_post(body=msg, message_type='comment')
 
         if len(records) == 100:  # assumes there are more whenever search hits limit
             self.env.ref('account.ir_cron_auto_post_draft_entry')._trigger()

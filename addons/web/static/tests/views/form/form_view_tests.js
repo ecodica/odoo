@@ -13110,4 +13110,96 @@ QUnit.module("Views", (hooks) => {
             assert.verifySteps(["create", "read"]);
         }
     );
+
+    QUnit.test(
+        "commitChanges with a field input removed during an update",
+        async function (assert) {
+            assert.expect(1);
+            serverData.models.partner.records[1].p = [1, 5];
+            serverData.models.partner.onchanges = {
+                foo() {},
+            };
+
+            const def = makeDeferred();
+
+            await makeView({
+                type: "form",
+                resModel: "partner",
+                resId: 2,
+                serverData,
+                arch: `
+                 <form>
+                    <field name="p">
+                        <tree editable="bottom">
+                            <field name="foo"/>
+                        </tree>
+                    </field>
+                </form>`,
+                async mockRPC(route, args) {
+                    if (args.method === "onchange") {
+                        await def;
+                    }
+
+                    if (args.method === "write") {
+                        assert.deepEqual(args.args[1], {
+                            p: [
+                                [1, 1, { foo: "new foo" }],
+                                [4, 5, false],
+                            ],
+                        });
+                    }
+                },
+            });
+
+            await click(target.querySelector('.o_data_cell[name="foo"]'));
+            const input = target.querySelector('.o_data_cell[name="foo"] input');
+            input.value = "new foo";
+            await triggerEvent(input, null, "input");
+
+            triggerHotkey("Tab");
+            await nextTick();
+
+            def.resolve();
+            await click(target, ".o_form_button_save");
+        }
+    );
+
+    QUnit.test("containing a nested x2many list view should not overflow", async function (assert) {
+        serverData.models.partner_type.records.push({
+            id: 3, display_name: 'very'.repeat(30) + '_long_name', color: 10,
+        });
+
+        const record = serverData.models.partner.records[0];
+        record.timmy = [3];
+
+        await makeView({
+            type: "form",
+            resModel: "partner",
+            resId: record.id,
+            serverData,
+            arch: `
+            <form>
+                <sheet>
+                    <group>
+                        <group/>
+                        <group>
+                            <field name="timmy" widget="many2many">
+                                <tree>
+                                    <field name="display_name"/>
+                                    <field name="color"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+            </form>`,
+        });
+
+        const table = target.querySelector('table');
+        const group = target.querySelector('.o_inner_group:last-child');
+
+        assert.equal(group.clientWidth, group.scrollWidth);
+        table.style.tableLayout = 'auto';
+        assert.ok(group.clientWidth < group.scrollWidth);
+    });
 });

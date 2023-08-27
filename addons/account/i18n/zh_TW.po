@@ -745,8 +745,9 @@ msgid ""
 "specific.\" aria-label=\"Values set here are company-specific.\" "
 "groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-"
-"label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+"<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" aria-"
+"label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\" "
+"role=\"img\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -755,15 +756,15 @@ msgid ""
 "specific.\" aria-label=\"Values set here are company-specific.\" "
 "role=\"img\"/>"
 msgstr ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-"
-"label=\"此處設定的值是特定於公司的.\" role=\"img\"/>"
+"<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" aria-"
+"label=\"此處設定的值是特定於每間公司的。\" role=\"img\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid ""
 "<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
 "specific.\"/>"
-msgstr "<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\"/>"
+msgstr "<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_payment_term_form
@@ -828,8 +829,8 @@ msgid ""
 "<span class=\"o_form_label\">Cash Discount Tax Reduction</span>\n"
 "                                    <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" role=\"img\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\"/>"
 msgstr ""
-"<span class=\"o_form_label\">現金折扣的稅項減免</span>\n"
-"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" role=\"img\" aria-label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\"/>"
+"<span class=\"o_form_label\">現金折扣稅項減免</span>\n"
+"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" role=\"img\" aria-label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -847,8 +848,8 @@ msgid ""
 "<span class=\"o_form_label\">Default Taxes</span>\n"
 "                                    <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"o_form_label\">預設稅</span>\n"
-"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+"<span class=\"o_form_label\">預設稅項</span>\n"
+"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" aria-label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -857,7 +858,7 @@ msgid ""
 "                                    <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" role=\"img\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\"/>"
 msgstr ""
 "<span class=\"o_form_label\">財政國家</span>\n"
-"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" role=\"img\" aria-label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -865,8 +866,8 @@ msgid ""
 "<span class=\"o_form_label\">Fiscal Localization</span>\n"
 "                                    <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"o_form_label\">財務功能本地化模組</span>\n"
-"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+"<span class=\"o_form_label\">財政本地化套裝</span>\n"
+"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" aria-label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -874,8 +875,8 @@ msgid ""
 "<span class=\"o_form_label\">Main Currency</span>\n"
 "                                    <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"o_form_label\">主要幣別</span>\n"
-"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+"<span class=\"o_form_label\">主要貨幣</span>\n"
+"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" aria-label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -888,8 +889,8 @@ msgid ""
 "<span class=\"o_form_label\">Rounding Method</span>\n"
 "                                    <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"o_form_label\">捨入方法</span>\n"
-"<span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於公司的.\" aria-label=\"此處設定的值是特定於公司的.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+"<span class=\"o_form_label\">捨入方式</span>\n"
+"                                    <span class=\"fa fa-lg fa-building-o\" title=\"此處設定的值是特定於每間公司的。\" aria-label=\"此處設定的值是特定於每間公司的。\" groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -3617,7 +3618,7 @@ msgstr "現金差額收益"
 #: model:ir.model.fields,field_description:account.field_account_chart_template__default_cash_difference_income_account_id
 #: model:ir.model.fields,field_description:account.field_res_company__default_cash_difference_income_account_id
 msgid "Cash Difference Income Account"
-msgstr "現金差額盈餘科目"
+msgstr "現金差額盈餘賬戶"
 
 #. module: account
 #. odoo-python
@@ -3732,7 +3733,7 @@ msgstr "費用科目的類別"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_chart_template__property_account_income_categ_id
 msgid "Category of Income Account"
-msgstr "收入科目的類別"
+msgstr "收入賬戶類別"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_default_terms_and_conditions
@@ -4125,7 +4126,7 @@ msgstr "計算餘額"
 msgid ""
 "Computed field, listing the tax grids impacted by this line, and the amount "
 "it applies to each of them."
-msgstr "計算欄位，列出受此明細影響的稅金統計，以及它應用於每個稅金統計的金額."
+msgstr "計算得出的欄位，列出受此資料行影響的稅務規則，及資料行套用於每個規則的金額。"
 
 #. module: account
 #: model:ir.model,name:account.model_res_config_settings
@@ -5203,7 +5204,7 @@ msgstr "預設費用科目"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
 msgid "Default Income Account"
-msgstr "預設收入科目"
+msgstr "預設收入賬戶"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -6652,7 +6653,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__email_from
 #: model_terms:ir.ui.view,arch_db:account.view_account_group_form
 msgid "From"
-msgstr "來自"
+msgstr "由"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
@@ -7371,12 +7372,12 @@ msgstr "收入"
 #: model:ir.model.fields,field_description:account.field_product_product__property_account_income_id
 #: model:ir.model.fields,field_description:account.field_product_template__property_account_income_id
 msgid "Income Account"
-msgstr "收入科目"
+msgstr "收入賬戶"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_chart_template__property_account_income_id
 msgid "Income Account on Product Template"
-msgstr "產品模板的收入科目"
+msgstr "產品範本收入賬戶"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
@@ -7470,7 +7471,7 @@ msgstr "在這裡插入您的條款和條件..."
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Install More Packages"
-msgstr "安裝更多的模組套件"
+msgstr "安裝更多套裝"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_position_form
@@ -9274,7 +9275,7 @@ msgstr "我的應收憑單"
 #: model:account.report.column,name:account.generic_tax_report_column_net
 #: model:account.report.column,name:account.generic_tax_report_tax_account_column_net
 msgid "NET"
-msgstr "淨"
+msgstr "淨額"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account_template__name
@@ -10181,7 +10182,7 @@ msgstr "損益表科目"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Package"
-msgstr "包裹"
+msgstr "套裝"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_invoice_report__payment_state__paid
@@ -11787,12 +11788,12 @@ msgstr "未完成結餘"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__module_account_sepa
 msgid "SEPA Credit Transfer (SCT)"
-msgstr "SEPA貸方交易(SCT)"
+msgstr "SEPA 轉賬付款（SCT）"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "SEPA Direct Debit (SDD)"
-msgstr "SEPA直接借記(SDD)"
+msgstr "SEPA 直接扣賬（SDD）"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__message_has_sms_error
@@ -12979,7 +12980,7 @@ msgstr "稅項組別"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
 msgid "Tax ID"
-msgstr "稅(統一編號)"
+msgstr "稅務編號"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__res_config_settings__show_line_subtotals_tax_selection__tax_included
@@ -13207,7 +13208,7 @@ msgstr "採用的稅"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "TaxCloud"
-msgstr "稅務雲"
+msgstr "TaxCloud"
 
 #. module: account
 #. odoo-python
@@ -13904,6 +13905,13 @@ msgstr ""
 "  例如:.*N°48748 abc123.*"
 
 #. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The move could not be posted for the following reason: %(error_message)s"
+msgstr "分錄未能過賬，原因： %(error_message)s"
+
+#. module: account
 #. odoo-javascript
 #: code:addons/account/static/src/js/tours/account.js:0
 #, python-format
@@ -14557,7 +14565,7 @@ msgstr "這一欄位被用在應收和應付的日記帳分錄您可以在這明
 #. module: account
 #: model_terms:ir.actions.act_window,help:account.open_account_journal_dashboard_kanban
 msgid "This is the accounting dashboard"
-msgstr "這是會計儀表版"
+msgstr "這是「會計概覽畫面」"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_res_config_settings__account_default_credit_limit
@@ -15219,7 +15227,7 @@ msgstr "使用公司選擇器"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__module_account_sepa_direct_debit
 msgid "Use SEPA Direct Debit"
-msgstr "使用SEPA直接計入借方"
+msgstr "使用 SEPA 直接扣賬"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_reversal__journal_id

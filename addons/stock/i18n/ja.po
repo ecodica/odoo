@@ -5007,7 +5007,7 @@ msgstr "過去12ヶ月の間に入庫した在庫移動の数"
 #: model:ir.model.fields,help:stock.field_stock_picking__message_needaction_counter
 #: model:ir.model.fields,help:stock.field_stock_scrap__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "アクションを必要とするメッセージの数"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_lot__message_has_error_counter
@@ -7203,6 +7203,13 @@ msgid "Sequence return"
 msgstr ""
 
 #. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_picking.py:0
+#, python-format
+msgid "Sequences %s already exist."
+msgstr ""
+
+#. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__lot_ids
 msgid "Serial Numbers"
 msgstr "シリアルナンバー"
@@ -7351,7 +7358,7 @@ msgstr "倉庫を特定する略称"
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking__show_allocation
 msgid "Show Allocation"
-msgstr ""
+msgstr "割り当てを表示"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking__show_check_availability
@@ -7535,7 +7542,7 @@ msgstr "移動元ロケーション"
 #: model:ir.model.fields,field_description:stock.field_stock_move__location_usage
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__location_usage
 msgid "Source Location Type"
-msgstr ""
+msgstr "ロケーションタイプソース"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.message_body
@@ -7877,7 +7884,7 @@ msgstr ""
 msgid ""
 "Technical Field used to decide whether the button \"Allocation\" should be "
 "displayed."
-msgstr ""
+msgstr "”割り当て”ボタンを表示するかどうかを決定するために使用される技術フィールド。"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse
@@ -8029,6 +8036,10 @@ msgid ""
 "            On the operation type you could e.g. specify if packing is needed by default,\n"
 "            if it should show the customer."
 msgstr ""
+"オペレーションタイプシステムにより、各在庫オペレーションに\n"
+"　　　特定のタイプを割り当て、それに応じてビューを変更することができます。\n"
+"            オペレーションタイプでは、例えば、顧客に表示する必要がある場合に、\n"
+"　　　デフォルトで梱包が必要かどうかを指定できます。"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_quant__package_id
@@ -9049,7 +9060,7 @@ msgstr "倉庫ドメイン"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.replenishment_option_tree_view
 msgid "Warehouse Location"
-msgstr ""
+msgstr "倉庫ロケーション"
 
 #. module: stock
 #: model:ir.ui.menu,name:stock.menu_warehouse_config
@@ -9597,8 +9608,8 @@ msgstr "ドラフトの移動を分割することはできません。 最初�
 #. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "You cannot split a stock move that has been set to 'Done'."
-msgstr "完了に設定されている在庫移動を分割することはできません。"
+msgid "You cannot split a stock move that has been set to 'Done' or 'Cancel'."
+msgstr ""
 
 #. module: stock
 #. odoo-python
@@ -9861,7 +9872,7 @@ msgstr "[例] PO0032"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_location_form
 msgid "e.g. Physical Locations"
-msgstr ""
+msgstr "例: 物理的ロケーション"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_type_form

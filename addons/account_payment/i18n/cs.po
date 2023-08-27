@@ -8,6 +8,7 @@
 # Rastislav Brencic <rastislav.brencic@azet.sk>, 2022
 # Michal Veselý <michal@veselyberanek.net>, 2022
 # Jiří Podhorecký, 2022
+# Jakub Smolka, 2023
 # Aleš Fiala <f.ales1@seznam.cz>, 2023
 # 
 msgid ""
@@ -339,7 +340,7 @@ msgstr "Částka platby"
 #. module: account_payment
 #: model:ir.ui.menu,name:account_payment.payment_icon_menu
 msgid "Payment Icons"
-msgstr "Ikony platebních služeb"
+msgstr "Ikony platebních poskytovatelů"
 
 #. module: account_payment
 #: model:ir.model.fields,field_description:account_payment.field_payment_provider__journal_id
@@ -361,7 +362,7 @@ msgstr ""
 #. module: account_payment
 #: model:ir.ui.menu,name:account_payment.payment_provider_menu
 msgid "Payment Providers"
-msgstr ""
+msgstr "Platební poskytovatelé"
 
 #. module: account_payment
 #: model:ir.model,name:account_payment.model_payment_refund_wizard
@@ -499,7 +500,7 @@ msgstr ""
 #: code:addons/account_payment/controllers/payment.py:0
 #, python-format
 msgid "The provided parameters are invalid."
-msgstr ""
+msgstr "Zadané parametry nejsou platné."
 
 #. module: account_payment
 #: model:ir.model.fields,help:account_payment.field_account_payment__source_payment_id
@@ -561,6 +562,15 @@ msgstr "Zrušená transakce"
 msgid ""
 "You can't delete a payment method that is linked to a provider in the enabled or test state.\n"
 "Linked provider(s): %s"
+msgstr ""
+
+#. module: account_payment
+#. odoo-python
+#: code:addons/account_payment/models/payment_provider.py:0
+#, python-format
+msgid ""
+"You cannot uninstall this module as payment method transactions already "
+"exist."
 msgstr ""
 
 #. module: account_payment

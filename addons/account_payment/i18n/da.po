@@ -360,7 +360,7 @@ msgstr ""
 #. module: account_payment
 #: model:ir.ui.menu,name:account_payment.payment_provider_menu
 msgid "Payment Providers"
-msgstr ""
+msgstr "Betalingsudbydere"
 
 #. module: account_payment
 #: model:ir.model,name:account_payment.model_payment_refund_wizard
@@ -564,6 +564,15 @@ msgstr "Ugyldig transaktion"
 msgid ""
 "You can't delete a payment method that is linked to a provider in the enabled or test state.\n"
 "Linked provider(s): %s"
+msgstr ""
+
+#. module: account_payment
+#. odoo-python
+#: code:addons/account_payment/models/payment_provider.py:0
+#, python-format
+msgid ""
+"You cannot uninstall this module as payment method transactions already "
+"exist."
 msgstr ""
 
 #. module: account_payment

@@ -739,7 +739,7 @@ msgstr ""
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_purchase_report__delay
 msgid "Amount of time between purchase approval and order by date."
-msgstr "Zeitspanne zwischen Kaufgenehmigung und Auftragsdatum."
+msgstr "Zeitspanne zwischen Einkaufsbestätigung und Auftragsdatum."
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order_line__analytic_distribution
@@ -1166,7 +1166,7 @@ msgstr "Tage vor Eingang"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_report__delay
 msgid "Days to Confirm"
-msgstr "Tage zur Bestätigung"
+msgstr "Tage bis Bestätigung"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_report__delay_pass
@@ -1659,13 +1659,13 @@ msgstr "Nachrichten"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_double_validation_amount
 msgid "Minimum Amount"
-msgstr "Mindestmenge"
+msgstr "Mindestbetrag"
 
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_res_company__po_double_validation_amount
 #: model:ir.model.fields,help:purchase.field_res_config_settings__po_double_validation_amount
 msgid "Minimum amount for which a double validation is required"
-msgstr "Mindestbestellwert, ab dem eine doppelte Validierung erforderlich ist"
+msgstr "Mindestbetrag, ab dem eine doppelte Validierung erforderlich ist"
 
 #. module: purchase
 #: model:ir.model.constraint,message:purchase.constraint_purchase_order_line_accountable_required_fields
@@ -1764,7 +1764,7 @@ msgstr "Keine Nachricht"
 #. module: purchase
 #: model_terms:ir.actions.act_window,help:purchase.action_purchase_order_report_all
 msgid "No Purchase Analysis"
-msgstr "Keine Kaufanalyse"
+msgstr "Keine Einkaufsanalyse"
 
 #. module: purchase
 #: model_terms:ir.actions.act_window,help:purchase.product_normal_action_puchased
@@ -2094,7 +2094,7 @@ msgstr "Kaufverträge"
 #: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_graph
 #: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_pivot
 msgid "Purchase Analysis"
-msgstr "Einkaufstatistik"
+msgstr "Einkaufsanalyse"
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
@@ -2109,7 +2109,7 @@ msgstr "Einkaufsrastereintrag"
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
 msgid "Purchase History"
-msgstr "Kaufhistorie"
+msgstr "Einkaufshistorie"
 
 #. module: purchase
 #. odoo-python
@@ -2118,7 +2118,7 @@ msgstr "Kaufhistorie"
 #: code:addons/purchase/models/purchase.py:0
 #, python-format
 msgid "Purchase History for %s"
-msgstr "Kaufhistorie für %s"
+msgstr "Einkaufshistorie für %s"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_res_company__po_lead
@@ -2163,7 +2163,7 @@ msgstr "Einkaufsauftrag #"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_order_approval
 msgid "Purchase Order Approval"
-msgstr "Bestellbestätigung"
+msgstr "Einkaufsbestätigung"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_account_analytic_account__purchase_order_count
@@ -2947,7 +2947,7 @@ msgid ""
 "purchase %(quantity).2f %(unit)s."
 msgstr ""
 "Die Verpackung dieses Produkts erfolgt in %(pack_size).2f%(pack_name)s. Sie "
-"sollten%(quantity).2f%(unit)s einkaufen."
+"sollten %(quantity).2f%(unit)s einkaufen."
 
 #. module: purchase
 #. odoo-python
@@ -3307,8 +3307,8 @@ msgstr ""
 "Achten Sie beim Anlegen eines Einkaufsauftrags auf die "
 "<i>Pünktlichkeitsrate</i> des Lieferanten, also den Prozentsatz der "
 "pünktlich versandten Produkte. Wenn dieser zu niedrig ist, aktivieren Sie "
-"<i>automatische Mahnungen</i>. Einige Tage vor dem fälligen Versand sendet "
-"Odoo dem Lieferanten eine E-Mail, um ihn um eine Bestätigung der "
+"<i>automatische Erinnerungen</i>. Einige Tage vor dem fälligen Versand "
+"sendet Odoo dem Lieferanten eine E-Mail, um ihn um eine Bestätigung der "
 "Versanddaten zu bitten und Sie im Falle von Verzögerungen auf dem Laufenden "
 "zu halten. Um die Leistungsstatistik des Lieferanten zu erhalten, klicken "
 "Sie auf die Pünklichkeitsrate."

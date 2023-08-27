@@ -9,8 +9,8 @@
 # Odoo - Paolo Gatti (pgi), 2023
 # Sebastiano Picchi, 2023
 # Martin Trigaux, 2023
-# Marianna Ciofani, 2023
 # Sergio Zanchetta <primes2h@gmail.com>, 2023
+# Marianna Ciofani, 2023
 # 
 msgid ""
 msgstr ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:44+0000\n"
-"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2023\n"
+"Last-Translator: Marianna Ciofani, 2023\n"
 "Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -498,7 +498,7 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        Dear\n"
+"        Gentile\n"
 "        <t t-if=\"object.partner_id.parent_id\">\n"
 "            <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>),\n"
 "        </t>\n"
@@ -508,7 +508,7 @@ msgstr ""
 "        <br><br>\n"
 "        Di seguito\n"
 "        <t t-if=\"object.name\">\n"
-"            la tua fattura <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">FATT/2021/05/0005</span>\n"
+"            la fattura <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">FATT/2021/05/0005</span>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
 "            fattura\n"
@@ -736,6 +736,9 @@ msgid ""
 "check\" aria-label=\"Reversed\" title=\"Reversed\" role=\"img\"/><span "
 "class=\"d-none d-md-inline\"> Reversed</span></span>"
 msgstr ""
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
+"check\" aria-label=\"Reversed\" title=\"Reversed\" role=\"img\"/><span "
+"class=\"d-none d-md-inline\"> Stornato</span></span>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.portal_my_invoices
@@ -1935,7 +1938,7 @@ msgstr "Periodi contabili"
 #. module: account
 #: model:ir.model,name:account.model_account_report
 msgid "Accounting Report"
-msgstr ""
+msgstr "Rendiconto contabile"
 
 #. module: account
 #: model:ir.model,name:account.model_account_report_column
@@ -3264,7 +3267,7 @@ msgstr "Banche"
 #: model:ir.model.fields.selection,name:account.selection__account_tax_repartition_line__repartition_type__base
 #: model:ir.model.fields.selection,name:account.selection__account_tax_repartition_line_template__repartition_type__base
 msgid "Base"
-msgstr "Base"
+msgstr "Riferimento"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_tax__is_base_affected
@@ -6072,7 +6075,7 @@ msgstr ""
 #: code:addons/account/models/account_move_line.py:0
 #, python-format
 msgid "Early Payment Discount (%s)"
-msgstr ""
+msgstr "Sconto pagamento anticipato (%s)"
 
 #. module: account
 #. odoo-python
@@ -6111,7 +6114,7 @@ msgstr "E-mail"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__email_add_signature
 msgid "Email Add Signature"
-msgstr ""
+msgstr "Aggiungi firma e-mail"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_journal__alias_id
@@ -6123,7 +6126,7 @@ msgstr "Alias e-mail"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__email_layout_xmlid
 msgid "Email Notification Layout"
-msgstr ""
+msgstr "Layout notifica e-mail"
 
 #. module: account
 #: model:ir.model,name:account.model_mail_thread
@@ -7793,7 +7796,7 @@ msgstr "Intrastat"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_bank_statement_search
 msgid "Invalid"
-msgstr ""
+msgstr "Non valido"
 
 #. module: account
 #. odoo-python
@@ -7812,7 +7815,7 @@ msgstr "Ultimo giorno dell'anno fiscale non valido"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__tax_tag_invert
 msgid "Invert Tags"
-msgstr ""
+msgstr "Inverti tag"
 
 #. module: account
 #. odoo-python
@@ -9031,7 +9034,7 @@ msgstr "Chiudere registrazioni confermate con hash"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__is_log
 msgid "Log as Internal Note"
-msgstr ""
+msgstr "Registra come nota interna"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.bill_preview
@@ -9173,6 +9176,12 @@ msgid ""
 "SEPA Credit Transfer: Pay in the SEPA zone by submitting a SEPA Credit Transfer file to your bank. Module account_sepa is necessary.\n"
 "SEPA Direct Debit: Get paid in the SEPA zone thanks to a mandate your partner will have granted to you. Module account_sepa is necessary.\n"
 msgstr ""
+"Manuale: paga oppure ricevi pagamenti al di fuori di Odoo, con qualsiasi metodo.\n"
+"Fornitori di pagamento: ogni fornitore ha il proprio metodo. Richiedi una transazione su o verso una carta grazie ad un token di pagamento salvato dal partner quando compri o effettui un abbonamento online.\n"
+"Assegno: paga le fatture con gli assegni e stampali da Odoo.\n"
+"Versamento in lotto: colleziona vari assegni dei clienti generando e inviando un versamento complessivo alla tua banca. È necessario il modulo account_batch_payment.\n"
+"Bonifico SEPA: paga nella zona SEPA inviando un bonifico SEPA alla tua banca. È necessario il modulo account_sepa.\n"
+"Addebito diretto SEPA: ricevi pagamenti nella zona SEPA grazie ad un mandato che il partner deve garantirti. È necessario il modulo account_sepa.\n"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__res_company__fiscalyear_last_month__3
@@ -10851,6 +10860,8 @@ msgstr "Termini di pagamento: 30 giorni"
 #: model_terms:account.payment.term,note:account.account_payment_term_30days_early_discount
 msgid "Payment terms: 30 Days, 2% Early Payment Discount under 7 days"
 msgstr ""
+"Termini di pagamento: 30 giorni, 2% sconto pagamento anticipato entro 7 "
+"giorni"
 
 #. module: account
 #: model_terms:account.payment.term,note:account.account_payment_term_30_days_end_month_the_10
@@ -11287,7 +11298,7 @@ msgstr "Stampa di assegni per il pagamento dei fornitori"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement__problem_description
 msgid "Problem Description"
-msgstr ""
+msgstr "Descrizione problema"
 
 #. module: account
 #: model:ir.model,name:account.model_product_template
@@ -13742,13 +13753,6 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_payment_term.py:0
-#, python-format
-msgid "The Months and Days of the Payment Terms lines must be positive."
-msgstr ""
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/account_payment_term.py:0
 #: model_terms:ir.ui.view,arch_db:account.view_payment_term_form
 #, python-format
 msgid "The Payment Term must have one Balance line."
@@ -14267,6 +14271,13 @@ msgstr ""
 "- Per trovare la corrispondenza all'inizio della riga (nell'etichetta e nelle note), inserire semplicemente del testo.\n"
 "- Per trovare la corrispondenza ovunque (nell'etichetta e nelle note), inserire il testo tra .*\n"
 "  es.: .*N°48748 abc123.*"
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The move could not be posted for the following reason: %(error_message)s"
+msgstr ""
 
 #. module: account
 #. odoo-javascript
@@ -14854,7 +14865,7 @@ msgstr "Questo anno"
 #: model:ir.model.fields,help:account.field_account_setup_bank_manual_config__allow_out_payment
 #: model:ir.model.fields,help:account.field_res_partner_bank__allow_out_payment
 msgid "This account can be used for outgoing payments"
-msgstr ""
+msgstr "Il presente account può essere utilizzato per pagamenti in uscita"
 
 #. module: account
 #. odoo-python

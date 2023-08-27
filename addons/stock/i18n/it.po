@@ -5699,7 +5699,7 @@ msgstr "Tipo di collo:"
 #: model:ir.ui.menu,name:stock.menu_packaging_types
 #: model_terms:ir.ui.view,arch_db:stock.stock_package_type_tree
 msgid "Package Types"
-msgstr "Tipi di imballaggio"
+msgstr "Tipologie di collo"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant_package__package_use
@@ -7475,6 +7475,13 @@ msgstr "Sequenza di prelievo"
 #, python-format
 msgid "Sequence return"
 msgstr "Sequenza reso"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_picking.py:0
+#, python-format
+msgid "Sequences %s already exist."
+msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__lot_ids
@@ -10081,9 +10088,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "You cannot split a stock move that has been set to 'Done'."
+msgid "You cannot split a stock move that has been set to 'Done' or 'Cancel'."
 msgstr ""
-"Impossibile suddividere un movimento di magazzino con stato \"Completato\"."
 
 #. module: stock
 #. odoo-python

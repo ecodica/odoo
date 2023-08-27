@@ -7,11 +7,11 @@
 # Talal Albahra <talal.albahra@outlook.com>, 2022
 # ِAD Market <admarketsa@gmail.com>, 2022
 # Ziani Ahmed (Zity), 2022
-# Niyas Raphy, 2022
 # islam abdelmaaboud <islamabdelmaaboud@gmail.com>, 2023
 # Radwan Hallak <rdwan.hlak@gmail.com>, 2023
 # Mohammed Alreshi <alreshim@hotmail.com>, 2023
 # Martin Trigaux, 2023
+# Niyas Raphy, 2023
 # Malaz Abuidris <msea@odoo.com>, 2023
 # 
 msgid ""
@@ -41,9 +41,9 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"الحركة (%s) ليست متوازنة.\n"
-"مجموع الديون يساوي %sومجموع الإعتمادات يساوي %s.\n"
-"قد ترغب في تحديد حساب افتراضي في دفتر اليومية \"%s\" لموازنة كل حركة تلقائياً."
+"الحركة (%s) ليست مسواة.\n"
+"مجموع الديون يساوي %sومجموع الائتمانات يساوي %s.\n"
+"قد ترغب في تحديد حساب افتراضي في دفتر اليومية \"%s\" لمساواة كل حركة تلقائياً. "
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_tax__amount_type
@@ -1167,7 +1167,7 @@ msgstr "<span>إعداد التقارير</span>"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
 msgid "<span>Running Balance</span>"
-msgstr "الرصيد الجاري"
+msgstr "<span>الرصيد الجاري</span> "
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.bill_preview
@@ -5587,7 +5587,7 @@ msgstr "معطل"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Disc.%"
-msgstr "Disc.%"
+msgstr "خصم %"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_tour_upload_bill
@@ -9923,7 +9923,7 @@ msgstr "عدد الأخطاء"
 #: model:ir.model.fields,help:account.field_res_company__message_needaction_counter
 #: model:ir.model.fields,help:account.field_res_partner_bank__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_account__message_has_error_counter
@@ -12650,7 +12650,7 @@ msgstr "الإعداد"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.onboarding_chart_of_account_step
 msgid "Setup your chart of accounts and record initial balances."
-msgstr "قم بإنشاء سجل الحسابات الخاص بك وسجّل الأرصدة الافتتاحية. "
+msgstr "قم بإنشاء شجرة الحسابات الخاصة بك وسجّل الأرصدة الافتتاحية. "
 
 #. module: account
 #: model:ir.actions.server,name:account.model_account_move_action_share
@@ -13748,13 +13748,6 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_payment_term.py:0
-#, python-format
-msgid "The Months and Days of the Payment Terms lines must be positive."
-msgstr "يجب أن تكون الشهور والأيام لبنود شروط الدفع موجبة. "
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/account_payment_term.py:0
 #: model_terms:ir.ui.view,arch_db:account.view_payment_term_form
 #, python-format
 msgid "The Payment Term must have one Balance line."
@@ -14251,6 +14244,13 @@ msgstr ""
 "- لمطابقة النص في بداية السطر (في علامة التصنيف أو الملاحظات)، قم بملء النص بكل بساطة.\n"
 "- لمطابقة النص في أي مكان (في علامة التصنيف أو الملاحظات)، قم بوضع النص المراد بين علامتي *. \n"
 "  مثال: .*N°48748 abc123.*"
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The move could not be posted for the following reason: %(error_message)s"
+msgstr "تعذر ترحيل الحركة للسبب التالي: %(error_message)s "
 
 #. module: account
 #. odoo-javascript
@@ -15034,7 +15034,7 @@ msgstr "سوف يتم ترحيل هذه الحركة في التاريخ الم�
 #: code:addons/account/static/src/components/account_move_list/account_move_list.js:0
 #, python-format
 msgid "This operation will create a gap in the sequence."
-msgstr ""
+msgstr "ستتسبب هذه العملية في إحداث ثغرة في التسلسل. "
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_invoice_send__auto_delete
