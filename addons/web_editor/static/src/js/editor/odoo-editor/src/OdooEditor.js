@@ -78,6 +78,7 @@ import {
     leftPos,
     isNotAllowedContent,
     isEditorTab,
+    EMAIL_REGEX,
 } from './utils/utils.js';
 import { editorCommands } from './commands/commands.js';
 import { Powerbox } from './powerbox/Powerbox.js';
@@ -173,7 +174,6 @@ export const CLIPBOARD_WHITELISTS = {
     ],
     attributes: ['class', 'href', 'src', 'target'],
     styledTags: ['SPAN', 'B', 'STRONG', 'I', 'S', 'U', 'FONT', 'TD'],
-    styles: ['text-decoration', 'font-weight', 'background-color', 'color', 'font-style', 'text-decoration-line', 'font-size']
 };
 
 // Commands that don't require a DOM selection but take an argument instead.
@@ -715,7 +715,6 @@ export class OdooEditor extends EventTarget {
 
     sanitize(target) {
         this.observerFlush();
-
         let record;
         if (!target) {
             // If the target is not given,
@@ -723,6 +722,9 @@ export class OdooEditor extends EventTarget {
             // in the mutations from the last step.
             for (record of this._currentStep.mutations) {
                 const node = this.idFind(record.parentId || record.id) || this.editable;
+                if (!this.editable.contains(node)) {
+                    continue;
+                }
                 target = target
                     ? commonParentGet(target, node, this.editable)
                     : node;
@@ -1073,7 +1075,7 @@ export class OdooEditor extends EventTarget {
     }
     historyGetMissingSteps({fromStepId, toStepId}) {
         const fromIndex = this._historySteps.findIndex(x => x.id === fromStepId);
-        const toIndex = this._historySteps.findIndex(x => x.id === toStepId);
+        const toIndex = toStepId ? this._historySteps.findIndex(x => x.id === toStepId) : this._historySteps.length;
         if (fromIndex === -1 || toIndex === -1) {
             return -1;
         }
@@ -1331,7 +1333,6 @@ export class OdooEditor extends EventTarget {
                 this._activateContenteditable();
             }
             this.historySetSelection(step);
-            this.dispatchEvent(new Event('historyRevert'));
         }
     }
     /**
@@ -1902,7 +1903,9 @@ export class OdooEditor extends EventTarget {
             insertedZws = zws;
         }
         let start = range.startContainer;
+        const startBlock = closestBlock(start);
         let end = range.endContainer;
+        const endBlock = closestBlock(end);
         // Let the DOM split and delete the range.
         const doJoin =
             (closestBlock(start) !== closestBlock(range.commonAncestorContainer) ||
@@ -1973,6 +1976,21 @@ export class OdooEditor extends EventTarget {
                 restore();
                 break;
             }
+        }
+        // If the oDeleteBackward loop have emptied the start block and the
+        // range end in another element (rangeStart != rangeEnd), we delete
+        // the start block and move the cursor to the end block.
+        if (
+            startBlock &&
+            startBlock.textContent === '\u200B' &&
+            endBlock &&
+            startBlock !== endBlock &&
+            !isEmptyBlock(endBlock) &&
+            paragraphRelatedElements.includes(endBlock.nodeName)
+        ) {
+            startBlock.remove();
+            setSelection(endBlock, 0);
+            fillEmpty(endBlock);
         }
         if (insertedZws) {
             // Remove the zero-width space (zws) that was added to preserve the
@@ -3090,7 +3108,12 @@ export class OdooEditor extends EventTarget {
      * @param {Node} node
      */
     _cleanForPaste(node) {
-        if (!this._isWhitelisted(node) || this._isBlacklisted(node)) {
+        if (
+            !this._isWhitelisted(node) ||
+            this._isBlacklisted(node) ||
+            // Google Docs have their html inside a B tag with custom id.
+            node.id && node.id.startsWith('docs-internal-guid')
+        ) {
             if (!node.matches || node.matches(CLIPBOARD_BLACKLISTS.remove.join(','))) {
                 node.remove();
             } else {
@@ -3127,14 +3150,8 @@ export class OdooEditor extends EventTarget {
             for (const attribute of [...node.attributes]) {
                 // Keep allowed styles on nodes with allowed tags.
                 if (CLIPBOARD_WHITELISTS.styledTags.includes(node.nodeName) && attribute.name === 'style') {
-                    const spanInlineStyles = attribute.value.split(';').map(x => x.trim());
-                    const allowedSpanInlineStyles = spanInlineStyles.filter(rawStyle => {
-                        return CLIPBOARD_WHITELISTS.styles.includes(rawStyle.split(':')[0].trim());
-                    });
                     node.removeAttribute(attribute.name);
-                    if (allowedSpanInlineStyles.length > 0) {
-                        node.setAttribute(attribute.name, allowedSpanInlineStyles.join(';'));
-                    } else if (['SPAN', 'FONT'].includes(node.tagName)) {
+                    if (['SPAN', 'FONT'].includes(node.tagName)) {
                         for (const unwrappedNode of unwrapContents(node)) {
                             this._cleanForPaste(unwrappedNode);
                         }
@@ -3170,12 +3187,11 @@ export class OdooEditor extends EventTarget {
                 okClass instanceof RegExp ? okClass.test(item) : okClass === item,
             );
         } else {
-            const allowedSpanStyles = CLIPBOARD_WHITELISTS.styles.map(s => `span[style*="${s}"]`);
             return (
                 item.nodeType === Node.TEXT_NODE ||
                 (
                     item.matches &&
-                    item.matches([...CLIPBOARD_WHITELISTS.nodes, ...allowedSpanStyles].join(','))
+                    item.matches(CLIPBOARD_WHITELISTS.nodes)
                 )
             );
         }
@@ -3328,7 +3344,7 @@ export class OdooEditor extends EventTarget {
                     // Remove added space
                     textNodeSplitted.pop();
                     const potentialUrl = textNodeSplitted.pop();
-                    const lastWordMatch = potentialUrl.match(URL_REGEX_WITH_INFOS);
+                    const lastWordMatch = potentialUrl.match(URL_REGEX_WITH_INFOS) && !potentialUrl.match(EMAIL_REGEX);
 
                     if (lastWordMatch) {
                         const matches = getUrlsInfosInString(textSliced);
@@ -4491,7 +4507,12 @@ export class OdooEditor extends EventTarget {
             if (files.length && !clipboardElem.querySelector('table')) {
                 this.addImagesFiles(files).then(html => this._applyCommand('insert', this._prepareClipboardData(html)));
             } else {
-                this._applyCommand('insert', clipboardElem);
+                if (closestElement(sel.anchorNode, 'a')) {
+                    this._applyCommand('insert', clipboardElem.textContent);
+                }
+                else {
+                    this._applyCommand('insert', clipboardElem);
+                }
             }
         } else {
             const text = ev.clipboardData.getData('text/plain');

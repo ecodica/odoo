@@ -1549,6 +1549,7 @@ class TestPointOfSaleFlow(TestPointOfSaleCommon):
             'type': 'product',
             'categ_id': self.env.ref('product.product_category_all').id,
         })
+        self.partner1.write({'parent_id': self.env['res.partner'].create({'name': 'Parent'}).id})
 
         #add customer account payment method to pos config
         self.pos_config.write({
@@ -1607,6 +1608,7 @@ class TestPointOfSaleFlow(TestPointOfSaleCommon):
         reverser_customer_payment_entry = reverse_payment.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_receivable')
         #check that both use the same account
         self.assertEqual(len(reverser_customer_payment_entry), 2)
+        self.assertTrue(order.account_move.line_ids.partner_id == self.partner1.commercial_partner_id)
         self.assertEqual(reverser_customer_payment_entry[0].balance, -2.0)
         self.assertEqual(reverser_customer_payment_entry[1].balance, -4.0)
         self.assertEqual(original_customer_payment_entry.account_id.id, reverser_customer_payment_entry.account_id.id)
@@ -1681,7 +1683,17 @@ class TestPointOfSaleFlow(TestPointOfSaleCommon):
         })
         order_payment.with_context(**payment_context).check()
         session_id = self.pos_config.current_session_id
-        self.pos_config.current_session_id.action_pos_session_closing_control()
+
+        # closing the session with basic pos access
+        pos_user = self.env['res.users'].create({
+            'name': "PoS user",
+            'login': "pos_user",
+            'email': "pos_user@yourcompany.com",
+            'groups_id': [(6, 0, [self.ref('base.group_user'), self.ref('point_of_sale.group_pos_user')])],
+        })
+
+        self.pos_config.current_session_id.with_user(pos_user).action_pos_session_closing_control()
+
         #get journal entries created
         aml = session_id.move_id.line_ids.filtered(lambda x: x.account_id == self.account1 and x.tax_ids == self.tax1)
         self.assertEqual(aml.price_total, 220)

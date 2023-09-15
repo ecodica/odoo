@@ -8,6 +8,7 @@
 # Jinjiu Liu, 2022
 # Dylan Kiss, 2023
 # Martin Trigaux, 2023
+# Wil Odoo, 2023
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2023
 # Jolien De Paepe, 2023
 # 
@@ -3643,6 +3644,17 @@ msgstr ""
 #, python-format
 msgid "Cannot generate an unused account code."
 msgstr "Kan geen ongebruikte rekeningcode genereren."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_journal.py:0
+#, python-format
+msgid ""
+"Cannot generate an unused journal code. Please change the name for journal "
+"%s."
+msgstr ""
+"Kan geen ongebruikte dagboekcode genereren. Verander de naam van het dagboek"
+" %s."
 
 #. module: account
 #. odoo-python
@@ -13270,8 +13282,8 @@ msgstr "Tussenrekening"
 
 #. module: account
 #: model:ir.actions.server,name:account.action_move_switch_invoice_to_credit_note
-msgid "Switch into refund/credit note"
-msgstr "Converteer in creditfactuur"
+msgid "Switch into invoice/credit note"
+msgstr "Omzetten in factuur/creditfactuur"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_payment_term_line__end_month
@@ -13911,14 +13923,6 @@ msgid ""
 msgstr ""
 "De boekingsvolgorde komt niet overeen met het huidige formaat. Alleen de "
 "accountant kan dit wijzigen."
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/account_payment_term.py:0
-#, python-format
-msgid "The Months and Days of the Payment Terms lines must be positive."
-msgstr ""
-"De regels Maanden en Dagen van de betalingscondities moeten positief zijn."
 
 #. module: account
 #. odoo-python
@@ -17074,6 +17078,13 @@ msgid ""
 msgstr ""
 "Je kunt niet wisselen van rekening om het afletteren te voorkomen als "
 "gedeeltelijke afletteringen nog in behandeling zijn."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_account.py:0
+#, python-format
+msgid "You cannot switch the type of a posted document."
+msgstr "Je kan het type van een geboekt document niet wijzigen."
 
 #. module: account
 #. odoo-python

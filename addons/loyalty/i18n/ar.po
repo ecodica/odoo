@@ -4,9 +4,9 @@
 # 
 # Translators:
 # Mustafa Rawi <mustafa@cubexco.com>, 2022
-# Martin Trigaux, 2022
 # Mehjabin Farsana, 2022
 # Niyas Raphy, 2023
+# Martin Trigaux, 2023
 # Malaz Abuidris <msea@odoo.com>, 2023
 # 
 msgid ""
@@ -605,7 +605,7 @@ msgstr "باركود"
 #: code:addons/loyalty/models/loyalty_program.py:0
 #, python-format
 msgid "Buy 10 products, and get 10$ discount on the 11th one."
-msgstr ""
+msgstr "اشترِ 10 منتجات واحصل على خصم 10$ على المنتج الـ11. "
 
 #. module: loyalty
 #: model:loyalty.program,name:loyalty.3_cabinets_plus_1_free
@@ -1528,6 +1528,11 @@ msgstr "علامة تصنيف المنتج "
 #: model:ir.model,name:loyalty.model_product_product
 msgid "Product Variant"
 msgstr "متغير المنتج "
+
+#. module: loyalty
+#: model:ir.model.fields,help:loyalty.field_loyalty_program__discount_product_id
+msgid "Product used in the sales order to apply the discount."
+msgstr "المنتج المستخدم في أمر المبيعات لتطبيق الخصم."
 
 #. module: loyalty
 #: model:ir.model.fields,help:loyalty.field_loyalty_reward__discount_line_product_id
