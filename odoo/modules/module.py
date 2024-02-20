@@ -515,7 +515,7 @@ def get_modules():
     duplicates = set([x for x in plist if plist.count(x) > 1])
     if duplicates:
         _logger.warning("Duplicate Modules: %s ", duplicates)
-    return list(set(plist))
+    return sorted(set(plist))
 
 def get_modules_with_version():
     modules = get_modules()
