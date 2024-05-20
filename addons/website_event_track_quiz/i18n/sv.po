@@ -35,7 +35,7 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_leaderboard
 msgid ". Try another search."
-msgstr ""
+msgstr ". Försök med en annan sökning."
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.all_visitor_card
@@ -313,7 +313,7 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_leaderboard
 msgid "No user found for"
-msgstr ""
+msgstr "Ingen användare hittades för"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__awarded_points
@@ -457,7 +457,7 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.leaderboard_search_bar
 msgid "Search users"
-msgstr ""
+msgstr "Sök användare"
 
 #. module: website_event_track_quiz
 #: model:event.quiz,name:website_event_track_quiz.event_7_track_5_quiz
@@ -502,7 +502,7 @@ msgstr ""
 #: code:addons/website_event_track_quiz/static/src/js/event_quiz.js:0
 #, python-format
 msgid "There was an error validating this quiz."
-msgstr ""
+msgstr "Det uppstod ett fel vid valideringen av detta test."
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,help:website_event_track_quiz.field_event_quiz_answer__comment
@@ -516,7 +516,7 @@ msgstr ""
 #: code:addons/website_event_track_quiz/static/src/js/event_quiz.js:0
 #, python-format
 msgid "This quiz is already done. Retaking it is not possible."
-msgstr ""
+msgstr "Detta prov är redan gjort. Det är inte möjligt att göra om det."
 
 #. module: website_event_track_quiz
 #: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_5_question_1_1
@@ -551,7 +551,7 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.top3_visitor_card
 msgid "User rank"
-msgstr ""
+msgstr "Användarranking"
 
 #. module: website_event_track_quiz
 #: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_5_question_1_2

@@ -130,7 +130,7 @@ var AnimationEffect = Class.extend(mixins.ParentedMixin, {
         this.startEvents = startEvents || 'scroll';
         const modalEl = options.enableInModal ? parent.target.closest('.modal') : null;
         const mainScrollingElement = modalEl ? modalEl : $().getScrollingElement()[0];
-        const mainScrollingTarget = mainScrollingElement === document.documentElement ? window : mainScrollingElement;
+        const mainScrollingTarget = $().getScrollingTarget(mainScrollingElement)[0];
         this.$startTarget = $($startTarget ? $startTarget : this.startEvents === 'scroll' ? mainScrollingTarget : window);
         if (options.getStateCallback) {
             this._getStateCallback = options.getStateCallback;
@@ -871,13 +871,13 @@ registry.backgroundVideo = publicWidget.Widget.extend(MobileYoutubeAutoplayMixin
         if (relativeRatio >= 1.0) {
             style['width'] = '100%';
             style['height'] = (relativeRatio * 100) + '%';
-            style['left'] = '0';
-            style['top'] = (-(relativeRatio - 1.0) / 2 * 100) + '%';
+            style['inset-inline-start'] = '0';
+            style['inset-block-start'] = (-(relativeRatio - 1.0) / 2 * 100) + '%';
         } else {
             style['width'] = ((1 / relativeRatio) * 100) + '%';
             style['height'] = '100%';
-            style['left'] = (-((1 / relativeRatio) - 1.0) / 2 * 100) + '%';
-            style['top'] = '0';
+            style['inset-inline-start'] = (-((1 / relativeRatio) - 1.0) / 2 * 100) + '%';
+            style['inset-block-start'] = '0';
         }
         this.$iframe.css(style);
 
@@ -898,6 +898,10 @@ registry.backgroundVideo = publicWidget.Widget.extend(MobileYoutubeAutoplayMixin
         this.$iframe = this.$bgVideoContainer.find('.o_bg_video_iframe');
         this.$iframe.one('load', () => {
             this.$bgVideoContainer.find('.o_bg_video_loading').remove();
+            // When there is a "slide in (left or right) animation" element, we
+            // need to adjust the iframe size once it has been loaded, otherwise
+            // an horizontal scrollbar may appear.
+            this._adjustIframe();
         });
         this.$bgVideoContainer.prependTo(this.$target);
         $oldContainer.remove();
@@ -953,8 +957,11 @@ registry.socialShare = publicWidget.Widget.extend({
     _renderSocial: function (social) {
         var url = this.$el.data('urlshare') || document.URL.split(/[?#]/)[0];
         url = encodeURIComponent(url);
-        var title = document.title.split(" | ")[0];  // get the page title without the company name
-        var hashtags = ' #' + document.title.split(" | ")[1].replace(' ', '') + ' ' + this.hashtags;  // company name without spaces (for hashtag)
+        const titleParts = document.title.split(" | ");
+        const title = titleParts[0]; // Get the page title without the company name
+        const hashtags = titleParts.length === 1
+            ? ` ${this.hashtags}`
+            : ` #${titleParts[1].replace(" ", "")} ${this.hashtags}`; // Company name without spaces (for hashtag)
         var socialNetworks = {
             'facebook': 'https://www.facebook.com/sharer/sharer.php?u=' + url,
             'twitter': 'https://twitter.com/intent/tweet?original_referer=' + url + '&text=' + encodeURIComponent(title + hashtags + ' - ') + url,
@@ -1267,8 +1274,9 @@ registry.BottomFixedElement = publicWidget.Widget.extend({
      */
     async start() {
         this.$scrollingElement = $().getScrollingElement();
+        this.$scrollingTarget = $().getScrollingTarget(this.$scrollingElement);
         this.__hideBottomFixedElements = _.debounce(() => this._hideBottomFixedElements(), 100);
-        this.$scrollingElement.on('scroll.bottom_fixed_element', this.__hideBottomFixedElements);
+        this.$scrollingTarget.on('scroll.bottom_fixed_element', this.__hideBottomFixedElements);
         $(window).on('resize.bottom_fixed_element', this.__hideBottomFixedElements);
         return this._super(...arguments);
     },
@@ -1277,7 +1285,8 @@ registry.BottomFixedElement = publicWidget.Widget.extend({
      */
     destroy() {
         this._super(...arguments);
-        this.$scrollingElement.off('.bottom_fixed_element');
+        this.$scrollingElement.off('.bottom_fixed_element'); // TODO remove in master
+        this.$scrollingTarget.off('.bottom_fixed_element');
         $(window).off('.bottom_fixed_element');
         this._restoreBottomFixedElements($('.o_bottom_fixed_element'));
     },
@@ -1353,6 +1362,7 @@ registry.WebsiteAnimate = publicWidget.Widget.extend({
     start() {
         this.lastScroll = 0;
         this.$scrollingElement = $().getScrollingElement();
+        this.$scrollingTarget = $().getScrollingTarget(this.$scrollingElement);
         this.$animatedElements = this.$('.o_animate');
 
         // Fix for "transform: none" not overriding keyframe transforms on
@@ -1390,7 +1400,7 @@ registry.WebsiteAnimate = publicWidget.Widget.extend({
         // for events that otherwise don’t support it. (e.g. useful when
         // scrolling a modal)
         this.__onScrollWebsiteAnimate = _.throttle(this._onScrollWebsiteAnimate.bind(this), 10);
-        this.$scrollingElement[0].addEventListener('scroll', this.__onScrollWebsiteAnimate, {capture: true});
+        this.$scrollingTarget[0].addEventListener('scroll', this.__onScrollWebsiteAnimate, {capture: true});
 
         $(window).on('resize.o_animate, shown.bs.modal.o_animate, slid.bs.carousel.o_animate, shown.bs.tab.o_animate, shown.bs.collapse.o_animate', () => {
             this.windowsHeight = $(window).height();
@@ -1412,7 +1422,7 @@ registry.WebsiteAnimate = publicWidget.Widget.extend({
                 'visibility': '',
             });
         $(window).off('.o_animate');
-        this.$scrollingElement[0].removeEventListener('scroll', this.__onScrollWebsiteAnimate, {capture: true});
+        this.$scrollingTarget[0].removeEventListener('scroll', this.__onScrollWebsiteAnimate, {capture: true});
         this.$scrollingElement[0].classList.remove('o_wanim_overflow_xy_hidden');
     },
 

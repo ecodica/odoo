@@ -10,7 +10,6 @@
 # Mustafa J. Kadhem <safi2266@gmail.com>, 2022
 # Mustafa Rawi <mustafa@cubexco.com>, 2022
 # Abdullah J <bosaeed4@gmail.com>, 2022
-# Niyas Raphy, 2022
 # Martin Trigaux, 2023
 # Wil Odoo, 2024
 # Malaz Abuidris <msea@odoo.com>, 2024
@@ -282,8 +281,6 @@ msgid "...and switch the timeline contents to fit your needs."
 msgstr "...وقم بتغيير محتوى المخطط الزمني ليناسب احتياجاتك. "
 
 #. module: website
-#: model:website,contact_us_button_url:website.default_website
-#: model:website,contact_us_button_url:website.website2
 #: model_terms:ir.ui.view,arch_db:website.layout
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "/contactus"
@@ -1393,7 +1390,6 @@ msgstr ""
 "قوية."
 
 #. module: website
-#: model:ir.model.fields,help:website.field_base_automation__website_published
 #: model:ir.model.fields,help:website.field_ir_actions_server__website_published
 #: model:ir.model.fields,help:website.field_ir_cron__website_published
 msgid ""
@@ -2141,7 +2137,6 @@ msgid "Autosizing"
 msgstr "التحجيم التلقائي"
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__website_published
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__website_published
 #: model:ir.model.fields,field_description:website.field_ir_cron__website_published
 msgid "Available on the Website"
@@ -3878,7 +3873,7 @@ msgstr "عرض هذا الموقع الإلكتروني عندما يزور ال
 msgid ""
 "Do not copy/paste code you do not understand, this could put your data at "
 "risk."
-msgstr ""
+msgstr "لا تقم بنسخ/لصق كود لا تفهمه. قد يُعرّض ذلك بياناتك للخطر. "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_cards
@@ -4352,7 +4347,6 @@ msgid "Extension View"
 msgstr "معاينة الامتداد"
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__xml_id
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__xml_id
 #: model:ir.model.fields,field_description:website.field_ir_cron__xml_id
 #: model:ir.model.fields,field_description:website.field_website_page__xml_id
@@ -5297,8 +5291,8 @@ msgid "Home page of the current website"
 msgstr "الصفحة الرئيسية للموقع الإلكتروني الحالي "
 
 #. module: website
-#. odoo-javascript
 #. odoo-python
+#. odoo-javascript
 #: code:addons/website/models/website.py:0
 #: code:addons/website/static/src/client_actions/website_preview/website_preview.xml:0
 #: model:ir.model.fields,field_description:website.field_website_page__is_homepage
@@ -5393,7 +5387,6 @@ msgid "ID"
 msgstr "المُعرف"
 
 #. module: website
-#: model:ir.model.fields,help:website.field_base_automation__xml_id
 #: model:ir.model.fields,help:website.field_ir_actions_server__xml_id
 #: model:ir.model.fields,help:website.field_ir_cron__xml_id
 msgid "ID of the action if defined in a XML file"
@@ -6684,7 +6677,7 @@ msgstr "القوائم"
 #. module: website
 #: model:ir.model,name:website.model_base_partner_merge_automatic_wizard
 msgid "Merge Partner Wizard"
-msgstr "معالج دمج الشريك"
+msgstr "معالج دمج الوكيل "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_facebook_page_options
@@ -7185,12 +7178,6 @@ msgid "Normal"
 msgstr "عادي"
 
 #. module: website
-#: model:website,prevent_zero_price_sale_text:website.default_website
-#: model:website,prevent_zero_price_sale_text:website.website2
-msgid "Not Available For Sale"
-msgstr "غير متوفر للبيع"
-
-#. module: website
 #: model_terms:ir.ui.view,arch_db:website.website_pages_kanban_view
 msgid "Not Published"
 msgstr "غير منشور "
@@ -7576,7 +7563,10 @@ msgid "Page Layout"
 msgstr "مخطط الصفحة "
 
 #. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/dialog/page_properties.xml:0
 #: model_terms:ir.ui.view,arch_db:website.website_page_properties_view_form
+#, python-format
 msgid "Page Name"
 msgstr "اسم الصفحة"
 
@@ -7879,6 +7869,13 @@ msgstr "إضافة إلى البداية "
 #: model_terms:ir.ui.view,arch_db:website.color_combinations_debug_view
 msgid "Preset"
 msgstr "معد مسبقاً "
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/fullscreen_indication/fullscreen_indication.js:0
+#, python-format
+msgid "Press %(key)s to exit full string"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -9531,6 +9528,17 @@ msgid "The chosen name already exists"
 msgstr "الاسم الذي اخترته موجود بالفعل "
 
 #. module: website
+#. odoo-python
+#: code:addons/website/models/res_company.py:0
+#, python-format
+msgid ""
+"The company %(company_name)r cannot be archived because it has a linked website %(website_name)r.\n"
+"Change that website's company first."
+msgstr ""
+"لا يمكن أرشفة الشركة %(company_name)r لأنها تملك موقعاً إلكترونياً مرتبطاً %(website_name)r.\n"
+"قم بتغيير شركة ذلك الموقع الإلكتروني أولاً. "
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "The company this website belongs to"
 msgstr "المؤسسة التي ينتمي إليها هذا الموقع الإلكتروني "
@@ -9593,7 +9601,6 @@ msgid "The full URL to access the document through the website."
 msgstr "رابطURL الكامل للوصول إلى المستند من خلال الموقع الإلكتروني. "
 
 #. module: website
-#: model:ir.model.fields,help:website.field_base_automation__website_url
 #: model:ir.model.fields,help:website.field_ir_actions_server__website_url
 #: model:ir.model.fields,help:website.field_ir_cron__website_url
 msgid "The full URL to access the server action through the website."
@@ -11002,7 +11009,6 @@ msgid "Website Pages"
 msgstr "صفحات الموقع الإلكتروني "
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__website_path
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__website_path
 #: model:ir.model.fields,field_description:website.field_ir_cron__website_path
 msgid "Website Path"
@@ -11057,7 +11063,6 @@ msgid "Website URL"
 msgstr "رابط URL للموقع الإلكتروني "
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__website_url
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__website_url
 #: model:ir.model.fields,field_description:website.field_ir_cron__website_url
 msgid "Website Url"
@@ -11342,6 +11347,17 @@ msgstr ""
 
 #. module: website
 #. odoo-python
+#: code:addons/website/models/website_menu.py:0
+#, python-format
+msgid ""
+"You cannot delete this website menu as this serves as the default parent "
+"menu for new websites (e.g., /shop, /event, ...)."
+msgstr ""
+"لا يمكنك حذف قائمة الموقع الإلكتروني هذا حيث إنه يعمل كالقائمة الرئيسية "
+"الافتراضية للمواقع الإلكترونية الجديدة (مثال: /shop، /event، ...). "
+
+#. module: website
+#. odoo-python
 #: code:addons/website/models/mixins.py:0
 #, python-format
 msgid "You do not have the rights to publish/unpublish"
@@ -11425,6 +11441,8 @@ msgid ""
 "Your Embed Code snippet doesn't have anything to display. Click on Edit to "
 "modify it."
 msgstr ""
+"Your Embed Code snippet doesn't have anything to display. Click on Edit to "
+"modify it."
 
 #. module: website
 #. odoo-javascript

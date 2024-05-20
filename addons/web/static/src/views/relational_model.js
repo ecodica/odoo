@@ -548,6 +548,10 @@ export class Record extends DataPoint {
         return !this.resId;
     }
 
+    get isValid() {
+        return !this._invalidFields.size;
+    }
+
     // -------------------------------------------------------------------------
     // Public
     // -------------------------------------------------------------------------
@@ -945,6 +949,12 @@ export class Record extends DataPoint {
             this._invalidFields.add(fieldName);
             this.model.notify();
         }
+    }
+
+    resetFieldValidity(fieldName) {
+        this.dirty = true;
+        this._invalidFields.delete(fieldName);
+        this.model.notify();
     }
 
     /**
@@ -1561,6 +1571,7 @@ class DynamicList extends DataPoint {
     exportState() {
         return {
             limit: this.limit,
+            offset: this.offset,
             initialLimit: this.initialLimit,
             orderBy: this.orderBy,
             initialOrderBy: this.initialOrderBy,
@@ -1961,7 +1972,6 @@ export class DynamicRecordList extends DynamicList {
     exportState() {
         return {
             ...super.exportState(),
-            offset: this.offset,
             countLimit: this.countLimit,
         };
     }
@@ -2361,7 +2371,7 @@ export class DynamicGroupList extends DynamicList {
         const everyGroupIsClosed = this.groups.every((group) => group.isFolded);
         if (
             everyGroupIsClosed &&
-            !(this.groupBy.includes(fieldName) || this.hasAggregate(fieldName))
+            !(this.groupBy[0].split(":")[0] === fieldName || this.hasAggregate(fieldName))
         ) {
             return;
         }
@@ -2694,6 +2704,7 @@ export class Group extends DataPoint {
             displayName: this.displayName,
             groupDomain: this.groupDomain,
             listState: this.list.exportState(),
+            range: this.range,
         };
     }
 

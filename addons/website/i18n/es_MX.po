@@ -4,13 +4,13 @@
 # 
 # Translators:
 # Cécile Collart <cco@odoo.com>, 2022
-# Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2023
 # Martin Trigaux, 2023
 # Braulio D. López Vázquez <bdl@odoo.com>, 2023
 # Lucia Pacheco, 2023
 # Iran Villalobos López, 2023
-# Fernanda Alvarez, 2024
 # Wil Odoo, 2024
+# Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2024
+# Fernanda Alvarez, 2024
 # 
 msgid ""
 msgstr ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 13:31+0000\n"
 "PO-Revision-Date: 2022-09-22 05:56+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Fernanda Alvarez, 2024\n"
 "Language-Team: Spanish (Mexico) (https://app.transifex.com/odoo/teams/41243/es_MX/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -78,7 +78,7 @@ msgstr "\"URL a\" es inválido: %s"
 #: code:addons/website/models/website_rewrite.py:0
 #, python-format
 msgid "\"URL to\" must contain parameter %s used in \"URL from\"."
-msgstr "El \"URL a\" debe contener el parámetro %s que se utilizó en \"URL de\"."
+msgstr "\"URL a\" debe contener el parámetro %s que se utilizó en \"URL de\"."
 
 #. module: website
 #. odoo-python
@@ -277,8 +277,6 @@ msgstr ""
 "... y cambie el contenido de su línea de tiempo según sus necesidades."
 
 #. module: website
-#: model:website,contact_us_button_url:website.default_website
-#: model:website,contact_us_button_url:website.website2
 #: model_terms:ir.ui.view,arch_db:website.layout
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "/contactus"
@@ -1397,7 +1395,6 @@ msgstr ""
 "visualización."
 
 #. module: website
-#: model:ir.model.fields,help:website.field_base_automation__website_published
 #: model:ir.model.fields,help:website.field_ir_actions_server__website_published
 #: model:ir.model.fields,help:website.field_ir_cron__website_published
 msgid ""
@@ -2153,7 +2150,6 @@ msgid "Autosizing"
 msgstr "Dimensionamiento automático"
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__website_published
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__website_published
 #: model:ir.model.fields,field_description:website.field_ir_cron__website_published
 msgid "Available on the Website"
@@ -4370,7 +4366,6 @@ msgid "Extension View"
 msgstr "Vista de extensión"
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__xml_id
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__xml_id
 #: model:ir.model.fields,field_description:website.field_ir_cron__xml_id
 #: model:ir.model.fields,field_description:website.field_website_page__xml_id
@@ -5320,8 +5315,8 @@ msgid "Home page of the current website"
 msgstr "Página de inicio del sitio web actual"
 
 #. module: website
-#. odoo-javascript
 #. odoo-python
+#. odoo-javascript
 #: code:addons/website/models/website.py:0
 #: code:addons/website/static/src/client_actions/website_preview/website_preview.xml:0
 #: model:ir.model.fields,field_description:website.field_website_page__is_homepage
@@ -5416,7 +5411,6 @@ msgid "ID"
 msgstr "ID"
 
 #. module: website
-#: model:ir.model.fields,help:website.field_base_automation__xml_id
 #: model:ir.model.fields,help:website.field_ir_actions_server__xml_id
 #: model:ir.model.fields,help:website.field_ir_cron__xml_id
 msgid "ID of the action if defined in a XML file"
@@ -6017,12 +6011,12 @@ msgstr "Elemento"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
 msgid "Item 1"
-msgstr "Elemento 1"
+msgstr "Tema 1"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
 msgid "Item 2"
-msgstr "Elemento 2"
+msgstr "Tema 2"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -6058,7 +6052,7 @@ msgstr "Contáctenos y juntos mejoraremos su empresa."
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 #, python-format
 msgid "Keep empty to use default value"
-msgstr "Mantener vacío para usar el valor predeterminado"
+msgstr "Déjelo vacío para usar el valor predeterminado"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_ir_asset__key
@@ -6202,7 +6196,7 @@ msgstr "Última modificación el"
 #: code:addons/website/static/src/xml/website.backend.xml:0
 #, python-format
 msgid "Last Month"
-msgstr "Mes anterior"
+msgstr "Mes pasado"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.website_visitor_view_kanban
@@ -7220,12 +7214,6 @@ msgid "Normal"
 msgstr "Normal"
 
 #. module: website
-#: model:website,prevent_zero_price_sale_text:website.default_website
-#: model:website,prevent_zero_price_sale_text:website.website2
-msgid "Not Available For Sale"
-msgstr "No está disponible para venta"
-
-#. module: website
 #: model_terms:ir.ui.view,arch_db:website.website_pages_kanban_view
 msgid "Not Published"
 msgstr "Sin publicar"
@@ -7615,7 +7603,10 @@ msgid "Page Layout"
 msgstr "Diseño de página"
 
 #. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/dialog/page_properties.xml:0
 #: model_terms:ir.ui.view,arch_db:website.website_page_properties_view_form
+#, python-format
 msgid "Page Name"
 msgstr "Nombre de la página"
 
@@ -7918,6 +7909,13 @@ msgstr "Anteponer"
 #: model_terms:ir.ui.view,arch_db:website.color_combinations_debug_view
 msgid "Preset"
 msgstr "Preestablecido"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/fullscreen_indication/fullscreen_indication.js:0
+#, python-format
+msgid "Press %(key)s to exit full screen"
+msgstr "Presione %(key)s para salir de la pantalla completa"
 
 #. module: website
 #. odoo-javascript
@@ -8956,7 +8954,7 @@ msgstr "Mostrar"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_website_form_options
 msgid "Show reCaptcha Policy"
-msgstr "Mostrar la política de reCaptcha"
+msgstr "Mostrar la política de reCAPTCHA"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.view_view_form_extend
@@ -9381,7 +9379,7 @@ msgstr "Rodeado"
 #: code:addons/website/controllers/form.py:0
 #, python-format
 msgid "Suspicious activity detected by Google reCaptcha."
-msgstr "Actividad sospechosa detectada por Google reCaptcha."
+msgstr "Google reCAPTCHA detectó actividad sospechosa."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippet_options
@@ -9574,6 +9572,17 @@ msgid "The chosen name already exists"
 msgstr "El nombre que eligió ya existe"
 
 #. module: website
+#. odoo-python
+#: code:addons/website/models/res_company.py:0
+#, python-format
+msgid ""
+"The company %(company_name)r cannot be archived because it has a linked website %(website_name)r.\n"
+"Change that website's company first."
+msgstr ""
+"La empresa %(company_name)r no se puede archivar ya que el sitio web %(website_name)r está vinculado a ella.\n"
+"Primero cambie la empresa de ese sitio web."
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "The company this website belongs to"
 msgstr "La empresa a la que pertenece este sitio web"
@@ -9636,7 +9645,6 @@ msgid "The full URL to access the document through the website."
 msgstr "La URL completa para acceder al documento a través del sitio web."
 
 #. module: website
-#: model:ir.model.fields,help:website.field_base_automation__website_url
 #: model:ir.model.fields,help:website.field_ir_actions_server__website_url
 #: model:ir.model.fields,help:website.field_ir_cron__website_url
 msgid "The full URL to access the server action through the website."
@@ -9959,8 +9967,8 @@ msgid ""
 "in url. Keep it empty to use the default name of the record."
 msgstr ""
 "Este valor se escapará para que sea compatible con la mayoría de navegadores"
-" y se use en el URL. Manténgalo vacío para utilizar el nombre predeterminado"
-" del registro."
+" y se utilizará en la URL. Déjelo vacío para usar el nombre predeterminado "
+"del registro."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.report_viewhierarchy_children
@@ -10032,7 +10040,7 @@ msgstr "Consejo: interactúe con sus visitantes para convertirlos en leads"
 #: model:digest.tip,name:website.digest_tip_website_2
 #: model_terms:digest.tip,tip_description:website.digest_tip_website_2
 msgid "Tip: Search Engine Optimization (SEO)"
-msgstr "Consejo: optimización de motores de búsqueda (SEO)"
+msgstr "Consejo: optimización para motores de búsqueda (SEO)"
 
 #. module: website
 #: model:digest.tip,name:website.digest_tip_website_3
@@ -10489,10 +10497,9 @@ msgid ""
 "or right-aligned image alongside textual content. Duplicate the element to "
 "create a list that fits your needs."
 msgstr ""
-"Utilice este snippet para crear varios tipos de componentes que presenten "
-"una imagen alineada a la izquierda o a la derecha junto con un contenido de "
-"texto. Duplique los elementos para crear una lista que se adecue a sus "
-"necesidades."
+"Utilice este snippet para crear varios tipos de componentes que incluyan una"
+" imagen alineada a la izquierda o a la derecha y texto. Duplique los "
+"elementos para crear una lista que se adapte a sus necesidades."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_carousel
@@ -11067,7 +11074,6 @@ msgid "Website Pages"
 msgstr "Páginas web"
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__website_path
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__website_path
 #: model:ir.model.fields,field_description:website.field_ir_cron__website_path
 msgid "Website Path"
@@ -11122,7 +11128,6 @@ msgid "Website URL"
 msgstr "URL del sitio web"
 
 #. module: website
-#: model:ir.model.fields,field_description:website.field_base_automation__website_url
 #: model:ir.model.fields,field_description:website.field_ir_actions_server__website_url
 #: model:ir.model.fields,field_description:website.field_ir_cron__website_url
 msgid "Website Url"
@@ -11410,6 +11415,17 @@ msgid ""
 msgstr ""
 "No puede eliminar un sitio web predeterminado %s. En su lugar, intente "
 "cambiar sus ajustes"
+
+#. module: website
+#. odoo-python
+#: code:addons/website/models/website_menu.py:0
+#, python-format
+msgid ""
+"You cannot delete this website menu as this serves as the default parent "
+"menu for new websites (e.g., /shop, /event, ...)."
+msgstr ""
+"No puede eliminar este menú del sitio web, funciona como el menú principal "
+"predeterminado para nuevos sitios web (por ejemplo, /tienda, /evento...)."
 
 #. module: website
 #. odoo-python

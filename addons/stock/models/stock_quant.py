@@ -8,7 +8,7 @@ from collections import defaultdict
 from psycopg2 import Error
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
 from odoo.osv import expression
 from odoo.tools import check_barcode_encoding, groupby
 from odoo.tools.float_utils import float_compare, float_is_zero
@@ -367,10 +367,13 @@ class StockQuant(models.Model):
                 ('location_id', '=', self.location_id.id),
                 ('location_dest_id', '=', self.location_id.id),
             ('lot_id', '=', self.lot_id.id),
-            '|',
-                ('package_id', '=', self.package_id.id),
-                ('result_package_id', '=', self.package_id.id),
         ]
+        if self.package_id:
+            action['domain'] += [
+                '|',
+                    ('package_id', '=', self.package_id.id),
+                    ('result_package_id', '=', self.package_id.id),
+            ]
         action['context'] = literal_eval(action.get('context'))
         action['context']['search_default_product_id'] = self.product_id.id
         return action
@@ -677,6 +680,8 @@ class StockQuant(models.Model):
         else:
             availaible_quantities = {lot_id: 0.0 for lot_id in list(set(quants.mapped('lot_id'))) + ['untracked']}
             for quant in quants:
+                if not quant.lot_id and strict and lot_id:
+                    continue
                 if not quant.lot_id:
                     availaible_quantities['untracked'] += quant.quantity - quant.reserved_quantity
                 else:
@@ -832,7 +837,20 @@ class StockQuant(models.Model):
                 'owner_id': owner_id and owner_id.id,
                 'in_date': in_date,
             })
-        return self._get_available_quantity(product_id, location_id, lot_id=lot_id, package_id=package_id, owner_id=owner_id, strict=False, allow_negative=True), in_date
+        return self._get_available_quantity(product_id, location_id, lot_id=lot_id, package_id=package_id, owner_id=owner_id, strict=True, allow_negative=True), in_date
+
+    def _raise_fix_unreserve_action(self, product_id):
+        action = self.env.ref('stock.stock_quant_stock_move_line_desynchronization', raise_if_not_found=False)
+        if action and self.user_has_groups('base.group_system'):
+            msg = _(
+                'It is not possible to reserve more products of %s than you have in stock.\n\n'
+                'You can fix the discrepancies by clicking on the button below.\n'
+                'The correction will remove the reservation of the impacted operations on all companies.\n'
+                'If the error persists, or you see this message appear often, '
+                'please submit a Support Ticket at https://www.odoo.com/help',
+                product_id.display_name
+            )
+            raise RedirectWarning(msg, action.id, _('Fix discrepancies'))
 
     @api.model
     def _update_reserved_quantity(self, product_id, location_id, quantity, lot_id=None, package_id=None, owner_id=None, strict=False):
@@ -861,7 +879,12 @@ class StockQuant(models.Model):
             # if we want to unreserve
             available_quantity = sum(quants.mapped('reserved_quantity'))
             if float_compare(abs(quantity), available_quantity, precision_rounding=rounding) > 0:
-                raise UserError(_('It is not possible to unreserve more products of %s than you have in stock.', product_id.display_name))
+                self._raise_fix_unreserve_action(product_id)
+                raise UserError(_(
+                    'It is not possible to unreserve more products of %s than you have in stock.\n'
+                    'Please contact your system administrator to rectify this issue.',
+                    product_id.display_name
+                ))
         else:
             return reserved_quants
 

@@ -34,7 +34,7 @@
 # Marko Happonen <marko.happonen@sprintit.fi>, 2022
 # Tuomas Lyyra <tuomas.lyyra@legenda.fi>, 2022
 # Konsta Aavaranta, 2023
-# Jarmo Kortetjärvi <jarmo.kortetjarvi@gmail.com>, 2023
+# Jarmo Kortetjärvi <jarmo.kortetjarvi@gmail.com>, 2024
 # Ossi Mantylahti <ossi.mantylahti@obs-solutions.fi>, 2024
 # 
 msgid ""
@@ -1085,7 +1085,7 @@ msgstr "Saatavilla varastossa"
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_track_confirmation
 msgid "Apply"
-msgstr "Muuta"
+msgstr "Käytä"
 
 #. module: stock
 #. odoo-javascript
@@ -1830,6 +1830,11 @@ msgid ""
 msgstr ""
 "Yksiköiden välinen muunnos onnistuu vain saman ryhmän (kategorian) sisällä. "
 "Konversio tehdään käyttäen kertoimena suhdetta."
+
+#. module: stock
+#: model:ir.actions.server,name:stock.stock_quant_stock_move_line_desynchronization
+msgid "Correct inconsistencies for reservation"
+msgstr "Korjaa epäjohdonmukaisuudet varausta varten"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_location__posx
@@ -3001,6 +3006,13 @@ msgid "First SN"
 msgstr "Ensimmäinen sarjanumero"
 
 #. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_quant.py:0
+#, python-format
+msgid "Fix discrepancies"
+msgstr "Korjaa ristiriidat"
+
+#. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_rule__group_propagation_option__fixed
 msgid "Fixed"
 msgstr "Kiinteä"
@@ -4054,10 +4066,28 @@ msgstr ""
 #: code:addons/stock/models/stock_quant.py:0
 #, python-format
 msgid ""
-"It is not possible to unreserve more products of %s than you have in stock."
+"It is not possible to reserve more products of %s than you have in stock.\n"
+"\n"
+"You can fix the discrepancies by clicking on the button below.\n"
+"The correction will remove the reservation of the impacted operations on all companies.\n"
+"If the error persists, or you see this message appear often, please submit a Support Ticket at https://www.odoo.com/help"
 msgstr ""
-"Ei ole mahdollista poistaa enemmän tuotteita %s: sta kuin sinulla on "
-"varastossa."
+"Ei ole mahdollista varata enempää %s-tuotteita kuin mitä sinulla on varastossa.\n"
+"\n"
+"Voit korjata poikkeamat klikkaamalla alla olevaa painiketta.\n"
+"Korjaus poistaa vaikutuksen kohteena olevien toimintojen varauksen kaikista yrityksistä.\n"
+"Jos virhe jatkuu tai tämä viesti näkyy usein, lähetä tukipyyntö osoitteeseen https://www.odoo.com/help"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_quant.py:0
+#, python-format
+msgid ""
+"It is not possible to unreserve more products of %s than you have in stock.\n"
+"Please contact your system administrator to rectify this issue."
+msgstr ""
+"Ei ole mahdollista purkaa varauksia useammasta %s-tuotteesta kuin mitä sinulla on varastossa.\n"
+"Ota yhteyttä järjestelmänvalvojaan tämän ongelman korjaamiseksi."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_picking__move_type
@@ -4486,6 +4516,13 @@ msgstr "Paikka: Kun saapuu"
 #, python-format
 msgid "Locations"
 msgstr "Paikat"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_picking.py:0
+#, python-format
+msgid "Locations to update"
+msgstr "Päivitettävät sijainnit"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
@@ -7156,7 +7193,7 @@ msgstr ""
 #: code:addons/stock/models/stock_rule.py:0
 #, python-format
 msgid "Rule %s belongs to %s while the route belongs to %s."
-msgstr ""
+msgstr "Sääntö %s kuuluu kohtaan %s, kun taas reitti kuuluu kohtaan %s."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_rule__rule_message
@@ -10007,6 +10044,28 @@ msgstr ""
 
 #. module: stock
 #. odoo-python
+#: code:addons/stock/models/stock_picking.py:0
+#, python-format
+msgid ""
+"You cannot pack products into the same package when they are from both "
+"immediate and planned transfers."
+msgstr ""
+"Samaan pakkaukseen ei voi pakata tuotteita, jotka ovat peräisin sekä "
+"välittömistä että suunnitelluista siirroista."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_picking.py:0
+#, python-format
+msgid ""
+"You cannot pack products into the same package when they are from different "
+"transfers with different operation types."
+msgstr ""
+"Tuotteita ei voi pakata samaan pakkaukseen, jos ne ovat peräisin eri "
+"siirroista, joissa on eri toimintatyypit."
+
+#. module: stock
+#. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
 msgid ""
@@ -10454,5 +10513,5 @@ msgstr "{{ (object.name or '').replace('/','_') }}"
 msgid ""
 "{{ object.company_id.name }} Delivery Order (Ref {{ object.name or 'n/a' }})"
 msgstr ""
-"{{ object.company_id.name }} Toimitustilaus (viite {{ object.name tai 'n/a' "
+"{{ object.company_id.name }} Toimitustilaus (viite {{ object.name or 'n/a' "
 "}})"

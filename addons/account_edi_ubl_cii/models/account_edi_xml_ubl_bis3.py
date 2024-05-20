@@ -111,14 +111,15 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
         # EXTENDS account.edi.xml.ubl_21
         vals = super()._get_partner_party_vals(partner, role)
 
+        partner = partner.commercial_partner_id
         vals['endpoint_id'] = partner.vat
         vals['endpoint_id_attrs'] = {'schemeID': COUNTRY_EAS.get(partner.country_id.code)}
 
-        if partner.country_code == 'NO' and 'l10n_no_bronnoysund_number' in partner._fields:
-            vals.update({
-                'endpoint_id': partner.l10n_no_bronnoysund_number,
-                'endpoint_id_attrs': {'schemeID': '0192'},
-            })
+        if partner.country_code == 'NO':
+            if 'l10n_no_bronnoysund_number' in partner._fields:
+                vals['endpoint_id'] = partner.l10n_no_bronnoysund_number
+            elif partner.vat:
+                vals['endpoint_id'] = partner.vat.replace("NO", "").replace("MVA", "")
         # [BR-NL-1] Dutch supplier registration number ( AccountingSupplierParty/Party/PartyLegalEntity/CompanyID );
         # With a Dutch supplier (NL), SchemeID may only contain 106 (Chamber of Commerce number) or 190 (OIN number).
         # [BR-NL-10] At a Dutch supplier, for a Dutch customer ( AccountingCustomerParty ) the customer registration
@@ -142,6 +143,8 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
             })
         if partner.country_id.code == "LU" and 'l10n_lu_peppol_identifier' in partner._fields and partner.l10n_lu_peppol_identifier:
             vals['endpoint_id'] = partner.l10n_lu_peppol_identifier
+        if partner.country_id.code == "SE" and partner.vat:
+            vals['endpoint_id'] = partner.vat.replace("SE", "")[:-2]
 
         return vals
 
@@ -159,7 +162,7 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
     def _get_delivery_vals_list(self, invoice):
         # EXTENDS account.edi.xml.ubl_21
         supplier = invoice.company_id.partner_id.commercial_partner_id
-        customer = invoice.commercial_partner_id
+        customer = invoice.partner_id
 
         economic_area = self.env.ref('base.europe').country_ids.mapped('code') + ['NO']
         intracom_delivery = (customer.country_id.code in economic_area
@@ -224,8 +227,6 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
 
         for vals in vals_list:
             vals.pop('name')
-            # [UBL-CR-601]-A UBL invoice should not include the InvoiceLine Item ClassifiedTaxCategory TaxExemptionReason
-            #vals.pop('tax_exemption_reason')
 
         return vals_list
 
@@ -240,6 +241,17 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
                 subtotal_vals['currency_dp'] = 2
 
         return vals_list
+
+    def _get_invoice_line_item_vals(self, line, taxes_vals):
+        # EXTENDS account.edi.xml.ubl_21
+        line_item_vals = super()._get_invoice_line_item_vals(line, taxes_vals)
+
+        for val in line_item_vals['classified_tax_category_vals']:
+            # [UBL-CR-601] TaxExemptionReason must not appear in InvoiceLine Item ClassifiedTaxCategory
+            # [BR-E-10] TaxExemptionReason must only appear in TaxTotal TaxSubtotal TaxCategory
+            val.pop('tax_exemption_reason')
+
+        return line_item_vals
 
     def _get_invoice_line_allowance_vals_list(self, line, tax_values_list=None):
         # EXTENDS account.edi.xml.ubl_21
@@ -258,6 +270,12 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
 
         vals['currency_dp'] = 2
         vals['price_vals']['currency_dp'] = 2
+
+        if line.currency_id.compare_amounts(vals['price_vals']['price_amount'], 0) == -1:
+            # We can't have negative unit prices, so we invert the signs of
+            # the unit price and quantity, resulting in the same amount in the end
+            vals['price_vals']['price_amount'] *= -1
+            vals['invoiced_quantity'] *= -1
 
         return vals
 
@@ -363,18 +381,17 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
                 break
 
         for line in invoice.invoice_line_ids.filtered(lambda x: x.display_type not in ('line_note', 'line_section')):
-            if invoice.currency_id.compare_amounts(line.price_unit, 0) == -1:
-                # [BR-27]-The Item net price (BT-146) shall NOT be negative.
-                constraints.update({'cen_en16931_positive_item_net_price': _(
-                    "The invoice contains line(s) with a negative unit price, which is not allowed."
-                    " You might need to set a negative quantity instead.")})
             if len(line.tax_ids.flatten_taxes_hierarchy().filtered(lambda t: t.amount_type != 'fixed')) != 1:
                 # [UBL-SR-48]-Invoice lines shall have one and only one classified tax category.
                 # /!\ exception: possible to have any number of ecotaxes (fixed tax) with a regular percentage tax
                 constraints.update({'cen_en16931_tax_line': _("Each invoice line shall have one and only one tax.")})
 
         for role in ('supplier', 'customer'):
-            constraints[f'cen_en16931_{role}_country'] = self._check_required_fields(vals[role], 'country_id')
+            constraints[f'cen_en16931_{role}_country'] = self._check_required_fields(
+                vals['vals'][f'accounting_{role}_party_vals']['party_vals']['postal_address_vals']['country_vals'],
+                'identification_code',
+                _("The country is required for the %s.", role)
+            )
             scheme_vals = vals['vals'][f'accounting_{role}_party_vals']['party_vals']['party_tax_scheme_vals'][-1:]
             if (
                 not (scheme_vals and scheme_vals[0]['company_id'] and scheme_vals[0]['company_id'][:2].isalpha())
@@ -473,9 +490,12 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
         if vals['customer'].country_id.code == 'NO':
             constraints.update({
                 'no_customer_bronnoysund': _(
-                    "The supplier %s must have a Bronnoysund company registry.",
-                    vals['customer'].display_name
-                ) if 'l10n_no_bronnoysund_number' not in vals['customer']._fields or not vals['customer'].l10n_no_bronnoysund_number else "",
+                    "The customer %s must have a Bronnoysund company registry.",
+                    vals['customer'].commercial_partner_id.display_name
+                ) if (
+                    'l10n_no_bronnoysund_number' not in vals['customer']._fields
+                    or not vals['customer'].commercial_partner_id.l10n_no_bronnoysund_number
+                ) else "",
             })
 
         return constraints

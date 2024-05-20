@@ -16,8 +16,6 @@
 # Viktor Pogrebniak <vp@aifil.ru>, 2022
 # Irina Fedulova <istartlin@gmail.com>, 2022
 # Vasiliy Korobatov <korobatov@gmail.com>, 2022
-# Collex100, 2022
-# Сергей Шебанин <sergey@shebanin.ru>, 2022
 # Ivan Kropotkin <yelizariev@itpp.dev>, 2022
 # Максим Дронь <dronmax@gmail.com>, 2022
 # Oleg Kuryan <oleg@ventor.tech>, 2022
@@ -27,6 +25,8 @@
 # alenafairy, 2023
 # sorin Rusu <to.rusu.sorin@gmail.com>, 2024
 # Wil Odoo, 2024
+# Collex100, 2024
+# Сергей Шебанин <sergey@shebanin.ru>, 2024
 # Смородин Даниил, 2024
 # 
 msgid ""
@@ -352,7 +352,7 @@ msgstr ""
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.res_config_settings_view_form
 msgid "<span class=\"o_form_label\">Invoicing Policy</span>"
-msgstr "<span class=\"o_form_label\">Политика актирования</span>"
+msgstr "<span class=\"o_form_label\">Политика выставления счетов</span>"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.extra_info
@@ -1052,17 +1052,8 @@ msgstr "Может публиковать"
 #. odoo-python
 #: code:addons/website_sale/controllers/main.py:0
 #, python-format
-msgid "Can not resequence a video at first position."
-msgstr "Невозможно повторно скомпоновать видео в первой позиции."
-
-#. module: website_sale
-#. odoo-python
-#: code:addons/website_sale/controllers/main.py:0
-#, python-format
-msgid "Can not resequence embedded image/video with a non compatible image."
-msgstr ""
-"Невозможно повторно скомпоновать встроенное изображение/видео с "
-"несовместимым изображением."
+msgid "You can't use a video as the product's main image."
+msgstr "Нельзя использовать видео в качестве основного изображения продукта."
 
 #. module: website_sale
 #. odoo-javascript
@@ -1926,13 +1917,13 @@ msgstr "Фурнитуры"
 #: code:addons/website_sale/static/src/xml/website_sale_dashboard.xml:0
 #, python-format
 msgid "Generate an invoice from orders ready for invoicing."
-msgstr "Сгенерировать акт из заказов, готовых к выставлению акта."
+msgstr "Сгенерировать счет по заказам, готовым к выставлению счета."
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.res_config_settings_view_form
 msgid ""
 "Generate the invoice automatically when the online payment is confirmed"
-msgstr "Создавать акт автоматически при получении онлайн-платежа"
+msgstr "Создавать счет автоматически при получении онлайн-платежа"
 
 #. module: website_sale
 #: model:ir.model.fields,help:website_sale.field_product_public_category__sequence
@@ -2122,7 +2113,7 @@ msgstr "Акты"
 #: model:ir.model.fields,field_description:website_sale.field_res_config_settings__module_account
 #: model_terms:ir.ui.view,arch_db:website_sale.res_config_settings_view_form
 msgid "Invoicing"
-msgstr "Актирование"
+msgstr "Выставление счетов"
 
 #. module: website_sale
 #: model:ir.model.fields,field_description:website_sale.field_product_template__is_published
@@ -2134,7 +2125,7 @@ msgstr "Опубликовано"
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.res_config_settings_view_form
 msgid "Issue invoices to customers"
-msgstr "Выставление актов клиентам"
+msgstr "Выставление счетов клиентам"
 
 #. module: website_sale
 #. odoo-python
@@ -2653,14 +2644,14 @@ msgstr "Заказы"
 #. module: website_sale
 #: model:ir.actions.act_window,name:website_sale.sale_order_action_to_invoice
 msgid "Orders To Invoice"
-msgstr "Заказы для выставления акта"
+msgstr "Заказы для выставления счета"
 
 #. module: website_sale
 #. odoo-javascript
 #: code:addons/website_sale/static/src/xml/website_sale_dashboard.xml:0
 #, python-format
 msgid "Orders to Invoice"
-msgstr "Заказы для выставления акта"
+msgstr "Заказы для выставления счета"
 
 #. module: website_sale
 #. odoo-javascript
@@ -3888,8 +3879,8 @@ msgid ""
 "The mode selected here applies as invoicing policy of any new product "
 "created but not of products already existing."
 msgstr ""
-"Выбранный режим применяется здесь как политика актирования любого нового "
-"товара, но не существующего."
+"Выбранный режим применяется здесь как политика выставления счетов любого "
+"нового товара, но не существующего."
 
 #. module: website_sale
 #. odoo-python
@@ -4412,7 +4403,7 @@ msgstr "В вас нет ни одного заказа с сайта"
 #. module: website_sale
 #: model_terms:ir.actions.act_window,help:website_sale.sale_order_action_to_invoice
 msgid "You don't have any order to invoice from the website"
-msgstr "У вас нет ни одного заказа для выставления акта с сайта"
+msgstr "У вас нет ни одного заказа для выставления счета с сайта"
 
 #. module: website_sale
 #: model:mail.template,subject:website_sale.mail_template_sale_cart_recovery

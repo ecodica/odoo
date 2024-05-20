@@ -3,6 +3,7 @@ odoo.define('pos_sale.SaleOrderManagementScreen', function (require) {
 
     const { sprintf } = require('web.utils');
     const { parse } = require('web.field_utils');
+    const { _t } = require('@web/core/l10n/translation');
     const { useListener } = require("@web/core/utils/hooks");
     const ControlButtonsMixin = require('point_of_sale.ControlButtonsMixin');
     const NumberBuffer = require('point_of_sale.NumberBuffer');
@@ -118,11 +119,6 @@ odoo.define('pos_sale.SaleOrderManagementScreen', function (require) {
                 }
               }
 
-              try {
-                await this.env.pos.load_new_partners();
-              }
-              catch (_error){
-              }
               let order_partner = this.env.pos.db.get_partner_by_id(sale_order.partner_id[0])
               if(order_partner){
                 currentPOSOrder.set_partner(order_partner);
@@ -294,7 +290,7 @@ odoo.define('pos_sale.SaleOrderManagementScreen', function (require) {
                             this.env.pos.format_currency(sale_order.amount_unpaid),
                             sale_order.amount_unpaid > 0 ? this.env.pos.format_currency(sale_order.amount_unpaid) : this.env.pos.format_currency(0),
                         );
-                        await this.showPopup('ErrorPopup', { title: 'Error amount too high', body: errorBody });
+                        await this.showPopup('ErrorPopup', { title: _t('Error amount too high'), body: errorBody });
                         down_payment = sale_order.amount_unpaid > 0 ? sale_order.amount_unpaid : 0;
                     }
 

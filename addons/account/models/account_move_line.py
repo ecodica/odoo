@@ -566,7 +566,7 @@ class AccountMoveLine(models.Model):
                     or accounts.get(('res.company', move.company_id.id, account_type))
                 )
                 if line.move_id.fiscal_position_id:
-                    account_id = self.move_id.fiscal_position_id.map_account(self.env['account.account'].browse(account_id))
+                    account_id = line.move_id.fiscal_position_id.map_account(self.env['account.account'].browse(account_id))
                 line.account_id = account_id
 
         product_lines = self.filtered(lambda line: line.display_type == 'product' and line.move_id.is_invoice(True))
@@ -1369,6 +1369,10 @@ class AccountMoveLine(models.Model):
                 res_vals.pop('balance', 0)
                 res_vals.pop('debit', 0)
                 res_vals.pop('credit', 0)
+
+            if res_vals['display_type'] in ('line_section', 'line_note'):
+                res_vals.pop('account_id')
+
         return result_vals_list
 
     @contextmanager
@@ -1468,9 +1472,8 @@ class AccountMoveLine(models.Model):
                 line_to_write -= line
                 continue
 
-            if line.parent_state == 'posted':
-                if any(key in vals for key in ('tax_ids', 'tax_line_id')):
-                    raise UserError(_('You cannot modify the taxes related to a posted journal item, you should reset the journal entry to draft to do so.'))
+            if line.parent_state == 'posted' and any(self.env['account.move']._field_will_change(line, vals, field_name) for field_name in ('tax_ids', 'tax_line_id')):
+                raise UserError(_('You cannot modify the taxes related to a posted journal item, you should reset the journal entry to draft to do so.'))
 
             # Check the lock date.
             if line.parent_state == 'posted' and any(self.env['account.move']._field_will_change(line, vals, field_name) for field_name in protected_fields['fiscal']):

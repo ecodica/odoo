@@ -496,10 +496,15 @@ class PosOrder(models.Model):
         }
 
     def _is_pos_order_paid(self):
-        return float_is_zero(self._get_rounded_amount(self.amount_total) - self.amount_paid, precision_rounding=self.currency_id.rounding)
+        amount_total = self.amount_total
+        # If we are checking if a refund was paid and if it was a total refund, we take into account the amount paid on
+        # the original order. For a pertial refund, we take into account the value of the items returned.
+        if float_is_zero(self.refunded_order_ids.amount_total + amount_total, precision_rounding=self.currency_id.rounding):
+            amount_total = -self.refunded_order_ids.amount_paid
+        return float_is_zero(self._get_rounded_amount(amount_total) - self.amount_paid, precision_rounding=self.currency_id.rounding)
 
     def _get_rounded_amount(self, amount):
-        if self.config_id.cash_rounding:
+        if self.config_id.cash_rounding and not self.refunded_order_ids:
             amount = float_round(amount, precision_rounding=self.config_id.rounding_method.rounding, rounding_method=self.config_id.rounding_method.rounding_method)
         currency = self.currency_id
         return currency.round(amount) if currency else amount
@@ -619,7 +624,7 @@ class PosOrder(models.Model):
             'journal_id': self.session_id.config_id.invoice_journal_id.id,
             'move_type': 'out_invoice' if self.amount_total >= 0 else 'out_refund',
             'ref': self.name,
-            'partner_id': self.partner_id.id,
+            'partner_id': self.partner_id.address_get(['invoice'])['invoice'],
             'partner_bank_id': self._get_partner_bank_id(),
             # considering partner's sale pricelist's currency
             'currency_id': self.pricelist_id.currency_id.id,
@@ -696,6 +701,7 @@ class PosOrder(models.Model):
                 'group_tax_id': None if tax_rep.tax_id.id == tax_line_vals['tax_id'] else tax_line_vals['tax_id'],
                 'amount_currency': amount_currency,
                 'balance': balance,
+                'tax_tag_invert': not tax_rep.refund_tax_id,
             })
             total_amount_currency += amount_currency
             total_balance += balance
@@ -714,13 +720,14 @@ class PosOrder(models.Model):
                 'tax_tag_ids': update_base_line_vals['tax_tag_ids'],
                 'amount_currency': amount_currency,
                 'balance': balance,
+                'tax_tag_invert': not base_line_vals['is_refund'],
             })
             total_amount_currency += amount_currency
             total_balance += balance
 
         # Cash rounding.
         cash_rounding = self.config_id.rounding_method
-        if self.config_id.cash_rounding and cash_rounding and not self.config_id.only_round_cash_method:
+        if self.config_id.cash_rounding and cash_rounding and (not self.config_id.only_round_cash_method or any(p.payment_method_id.is_cash_count for p in self.payment_ids)):
             amount_currency = cash_rounding.compute_difference(self.currency_id, total_amount_currency)
             if not self.currency_id.is_zero(amount_currency):
                 balance = company_currency.round(amount_currency * rate)
@@ -824,18 +831,21 @@ class PosOrder(models.Model):
         })
         reversal_entry.action_post()
 
-        # Reconcile the new receivable line with the lines from the payment move.
         pos_account_receivable = self.company_id.account_default_pos_receivable_account_id
-        reversal_entry_receivable = reversal_entry.line_ids.filtered(lambda l: l.account_id == pos_account_receivable)
-        payment_receivable = payment_moves.line_ids.filtered(lambda l: l.account_id == pos_account_receivable)
-        (reversal_entry_receivable | payment_receivable).reconcile()
+        account_receivable = self.payment_ids.payment_method_id.receivable_account_id
+        reversal_entry_receivable = reversal_entry.line_ids.filtered(lambda l: l.account_id in (pos_account_receivable + account_receivable))
+        payment_receivable = payment_moves.line_ids.filtered(lambda l: l.account_id in (pos_account_receivable + account_receivable))
+        lines_to_reconcile = defaultdict(lambda: self.env['account.move.line'])
+        for line in (reversal_entry_receivable | payment_receivable):
+            lines_to_reconcile[line.account_id] |= line
+        for line in lines_to_reconcile.values():
+            line.filtered(lambda l: not l.reconciled).reconcile()
 
     def action_pos_order_invoice(self):
         self.write({'to_invoice': True})
-        res = self._generate_pos_order_invoice()
         if self.company_id.anglo_saxon_accounting and self.session_id.update_stock_at_closing and self.session_id.state != 'closed':
             self._create_order_picking()
-        return res
+        return self._generate_pos_order_invoice()
 
     def _generate_pos_order_invoice(self):
         moves = self.env['account.move']
@@ -855,7 +865,7 @@ class PosOrder(models.Model):
             order.write({'account_move': new_move.id, 'state': 'invoiced'})
             new_move.sudo().with_company(order.company_id).with_context(skip_invoice_sync=True)._post()
             moves += new_move
-            payment_moves = order._apply_invoice_payments()
+            payment_moves = order._apply_invoice_payments(order.session_id.state == 'closed')
 
             if order.session_id.state == 'closed':  # If the session isn't closed this isn't needed.
                 # If a client requires the invoice later, we need to revers the amount from the closing entry, by making a new entry for that.
@@ -880,9 +890,9 @@ class PosOrder(models.Model):
     def action_pos_order_cancel(self):
         return self.write({'state': 'cancel'})
 
-    def _apply_invoice_payments(self):
+    def _apply_invoice_payments(self, is_reverse=False):
         receivable_account = self.env["res.partner"]._find_accounting_partner(self.partner_id).with_company(self.company_id).property_account_receivable_id
-        payment_moves = self.payment_ids.sudo().with_company(self.company_id)._create_payment_moves()
+        payment_moves = self.payment_ids.sudo().with_company(self.company_id)._create_payment_moves(is_reverse)
         if receivable_account.reconcile:
             invoice_receivables = self.account_move.line_ids.filtered(lambda line: line.account_id == receivable_account and not line.reconciled)
             if invoice_receivables:
@@ -953,8 +963,8 @@ class PosOrder(models.Model):
         if len(data['lines']) != len(existing_order.lines):
             return False
 
-        received_lines = sorted([(l[2]['product_id'], l[2]['qty'], l[2]['price_unit']) for l in data['lines']])
-        existing_lines = sorted([(l.product_id.id, l.qty, l.price_unit) for l in existing_order.lines])
+        received_lines = sorted([(l[2]['product_id'], l[2]['price_unit']) for l in data['lines']])
+        existing_lines = sorted([(l.product_id.id, l.price_unit) for l in existing_order.lines])
 
         if received_lines != existing_lines:
             return False
@@ -1511,10 +1521,14 @@ class ReportSaleDetails(models.AbstractModel):
 
                 if line.tax_ids_after_fiscal_position:
                     line_taxes = line.tax_ids_after_fiscal_position.sudo().compute_all(line.price_unit * (1-(line.discount or 0.0)/100.0), currency, line.qty, product=line.product_id, partner=line.order_id.partner_id or False)
+                    base_amounts = {}
                     for tax in line_taxes['taxes']:
                         taxes.setdefault(tax['id'], {'name': tax['name'], 'tax_amount':0.0, 'base_amount':0.0})
                         taxes[tax['id']]['tax_amount'] += tax['amount']
-                        taxes[tax['id']]['base_amount'] += tax['base']
+                        base_amounts[tax['id']] = tax['base']
+
+                    for tax_id, base_amount in base_amounts.items():
+                        taxes[tax_id]['base_amount'] += base_amount
                 else:
                     taxes.setdefault(0, {'name': _('No Taxes'), 'tax_amount':0.0, 'base_amount':0.0})
                     taxes[0]['base_amount'] += line.price_subtotal_incl

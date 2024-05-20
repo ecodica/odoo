@@ -4,10 +4,11 @@
 # 
 # Translators:
 # Cécile Collart <cco@odoo.com>, 2022
-# Martin Trigaux, 2022
 # Braulio D. López Vázquez <bdl@odoo.com>, 2023
-# Lucia Pacheco, 2023
 # Iran Villalobos López, 2023
+# Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2024
+# Martin Trigaux, 2024
+# Lucia Pacheco, 2024
 # Fernanda Alvarez, 2024
 # 
 msgid ""
@@ -252,7 +253,7 @@ msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
 "                        Hola<br><br>\n"
-"                        ¡<t t-out=\"user.name or ''\">Mitchell Admin</t> compartió el <strong t-out=\"object.name or ''\">documento</strong>con usted!\n"
+"                        <t t-out=\"user.name or ''\">Mitchell Admin</t> le compartió <strong t-out=\"object.name or ''\">un documento</strong>.\n"
 "                        <div style=\"margin: 16px 8px 16px 8px; text-align: center;\">\n"
 "                            <a t-att-href=\"object.website_url\">\n"
 "                                <img t-att-alt=\"object.name\" t-attf-src=\"{{ ctx.get('base_url') }}/web/image/slide.channel/{{ object.id }}/image_256\" style=\"height:auto; width:150px; margin: 16px;\">\n"
@@ -296,7 +297,7 @@ msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
 "                        Hola<br><br>\n"
-"                        ¡<t t-out=\"user.name or ''\">Mitchell Admin</t> compartió el <t t-out=\"object.slide_category or ''\">documento</t> <strong t-out=\"object.name or ''\">Árboles</strong> con usted!\n"
+"                        <t t-out=\"user.name or ''\">Mitchell Admin</t> le compartió el <t t-out=\"object.slide_category or ''\">documento</t> <strong t-out=\"object.name or ''\">Árboles</strong>.\n"
 "                        <div style=\"margin: 16px 8px 16px 8px; text-align: center;\">\n"
 "                            <a t-att-href=\"(object.website_share_url + '?fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
 "                                <img t-att-alt=\"object.name\" t-attf-src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/image_1024\" style=\"height:auto; width:150px; margin: 16px;\">\n"
@@ -1089,7 +1090,7 @@ msgstr "Una mesa"
 #. module: website_slides
 #: model:ir.model.constraint,message:website_slides.constraint_slide_tag_slide_tag_unique
 msgid "A tag must be unique!"
-msgstr "¡Las etiquetas deben ser únicas!"
+msgstr "Las etiquetas deben ser únicas."
 
 #. module: website_slides
 #: model:slide.answer,text_value:website_slides.slide_slide_demo_0_4_question_0_1
@@ -1133,7 +1134,7 @@ msgstr "Acceso solicitado"
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.view_slide_channel_form
 msgid "Access Rights"
-msgstr "Derechos de acceso"
+msgstr "Permisos de acceso"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_slide_partner_view_tree
@@ -1149,7 +1150,7 @@ msgstr "Logros"
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__message_needaction
 #: model:ir.model.fields,field_description:website_slides.field_slide_slide__message_needaction
 msgid "Action Needed"
-msgstr "Acción requerida"
+msgstr "Se requiere una acción"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__active
@@ -1299,7 +1300,7 @@ msgstr "Todos los miembros del canal."
 #: code:addons/website_slides/static/src/js/slides_course_quiz.js:0
 #, python-format
 msgid "All questions must be answered !"
-msgstr "¡Se deben responder todas las preguntas!"
+msgstr "No puede dejar preguntas sin responder."
 
 #. module: website_slides
 #: model_terms:slide.channel,description:website_slides.slide_channel_demo_5_furn2
@@ -1575,7 +1576,7 @@ msgstr "Fundamentos de jardinería"
 #: code:addons/website_slides/static/src/xml/website_slides_unsubscribe.xml:0
 #, python-format
 msgid "Be notified when a new content is added."
-msgstr "¿Desea que se le notifique cuando se agrega contenido nuevo?"
+msgstr "¿Desea que se le notifique cuando se agregue contenido nuevo?"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__can_comment
@@ -3294,7 +3295,7 @@ msgstr "Icono"
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_channel__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "Icono para indicar una actividad de excepción."
+msgstr "Icono que indica una actividad de excepción."
 
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_channel__message_needaction
@@ -4408,6 +4409,12 @@ msgid "Open To All"
 msgstr "Abierto a todos"
 
 #. module: website_slides
+#: code:addons/website_slides/controllers/mail.py:0
+#, python-format
+msgid "Only a single review can be posted per course."
+msgstr "Solo se puede publicar una reseña por curso."
+
+#. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_channel_invite__lang
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
@@ -4992,7 +4999,7 @@ msgstr "Optimizado para SEO"
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__message_has_sms_error
 #: model:ir.model.fields,field_description:website_slides.field_slide_slide__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "Error de entrega de SMS"
+msgstr "Error en el envío del SMS"
 
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_slide__embed_code_external
@@ -5679,7 +5686,7 @@ msgid ""
 "channel to access the content of the course."
 msgstr ""
 "Todos pueden acceder al curso: los usuarios no necesitan unirse al canal "
-"para acceder al contenido del curso."
+"para acceder al contenido."
 
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_channel__description_short
@@ -5951,7 +5958,7 @@ msgstr "Tipo"
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_channel__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Tipo de actividad de excepción registrada."
+msgstr "Tipo de la actividad de excepción registrada."
 
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_slide__url

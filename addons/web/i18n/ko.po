@@ -9,7 +9,7 @@
 # Martin Trigaux, 2023
 # Linkup <link-up@naver.com>, 2023
 # Sarah Park, 2023
-# Daye Jeong, 2023
+# Daye Jeong, 2024
 # Wil Odoo, 2024
 # 
 msgid ""
@@ -2614,6 +2614,8 @@ msgid ""
 "click the <i class=\"fa fa-cloud-upload fa-fw\"></i> button now to ensure "
 "your work is saved before you exit this tab."
 msgstr ""
+"주의! 최근 변경 내용이 너무 커서 자동으로 저장할 수 없습니다. 이 탭을 종료하기 전에 지금 <i class=\"fa fa-cloud-"
+"upload fa-fw\"></i> 버튼을 클릭하여 작업이 저장되었는지 확인하세요."
 
 #. module: web
 #. odoo-javascript
@@ -5154,6 +5156,7 @@ msgstr "구문 오류"
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/core/commands/command_items.xml:0
 #: code:addons/web/static/src/webclient/user_menu/user_menu_items.xml:0
 #, python-format
 msgid "TIP"
@@ -6179,6 +6182,13 @@ msgstr "모든 레코드"
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/core/commands/command_items.xml:0
+#, python-format
+msgid "and"
+msgstr "및"
+
+#. module: web
+#. odoo-javascript
 #: code:addons/web/static/src/core/domain_selector/domain_selector_branch_operator.xml:0
 #: code:addons/web/static/src/core/domain_selector/domain_selector_branch_operator.xml:0
 #: code:addons/web/static/src/core/domain_selector/domain_selector_branch_operator.xml:0
@@ -6776,3 +6786,10 @@ msgstr "기본 텍스트를 입력하거나 Enter 키를 누르십시오"
 #, python-format
 msgid "— press"
 msgstr "— 누르기"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/core/commands/command_items.xml:0
+#, python-format
+msgid "— search for"
+msgstr ""

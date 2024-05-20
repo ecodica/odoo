@@ -187,6 +187,9 @@ mimetypes.add_type('application/vnd.ms-fontobject', '.eot')
 mimetypes.add_type('application/x-font-ttf', '.ttf')
 # Add potentially wrong (detected on windows) svg mime types
 mimetypes.add_type('image/svg+xml', '.svg')
+# this one can be present on windows with the value 'text/plain' which
+# breaks loading js files from an addon's static folder
+mimetypes.add_type('text/javascript', '.js')
 
 # To remove when corrected in Babel
 babel.core.LOCALE_ALIASES['nb'] = 'nb_NO'
@@ -964,6 +967,8 @@ class Session(collections.abc.MutableMapping):
             # Like update_env(user=request.session.uid) but works when uid is None
             request.env = odoo.api.Environment(request.env.cr, self.uid, self.context)
             request.update_context(**self.context)
+            # request env needs to be able to access the latest changes from the auth layers
+            request.env.cr.commit()
 
         return pre_uid
 
@@ -2060,7 +2065,7 @@ class Application:
                     pass
                 elif isinstance(exc, SessionExpiredException):
                     _logger.info(exc)
-                elif isinstance(exc, (UserError, AccessError, NotFound)):
+                elif isinstance(exc, (UserError, AccessError)):
                     _logger.warning(exc)
                 else:
                     _logger.error("Exception during request handling.", exc_info=True)
