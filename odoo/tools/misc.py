@@ -1799,3 +1799,14 @@ def has_list_types(values, types):
         isinstance(values, (list, tuple)) and len(values) == len(types)
         and all(isinstance(item, type_) for item, type_ in zip(values, types))
     )
+
+
+def named_to_positional_printf(string: str, args: Mapping) -> tuple[str, tuple]:
+    """ Convert a named printf-style format string with its arguments to an
+    equivalent positional format string with its arguments. This implementation
+    does not support escaped ``%`` characters (``"%%"``).
+    """
+    if '%%' in string:
+        raise ValueError(f"Unsupported escaped '%' in format string {string!r}")
+    args = _PrintfArgs(args)
+    return string % args, tuple(args.values)
