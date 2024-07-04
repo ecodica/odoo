@@ -3,7 +3,7 @@
 import { registry } from "@web/core/registry";
 import { EventBus } from "@odoo/owl";
 
-class SaleOrderFetcher extends EventBus {
+export class SaleOrderFetcher extends EventBus {
     static serviceDependencies = ["orm", "pos"];
     constructor({ orm, pos }) {
         super();
