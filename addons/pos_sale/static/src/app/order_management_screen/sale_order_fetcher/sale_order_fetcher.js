@@ -3,6 +3,8 @@
 import { registry } from "@web/core/registry";
 import { EventBus } from "@odoo/owl";
 
+// DealerERP patch: Add export in order to inherit and extend the class
+// in l10n_at_d_erp module so NoVA tax data from SaleOrder can be copied to POS order
 export class SaleOrderFetcher extends EventBus {
     static serviceDependencies = ["orm", "pos"];
     constructor({ orm, pos }) {
