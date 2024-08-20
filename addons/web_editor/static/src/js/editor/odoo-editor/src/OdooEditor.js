@@ -2660,7 +2660,8 @@ export class OdooEditor extends EventTarget {
         } else if (ev && startTd && !isProtected(startTd)) {
             // We're redirected from a mousemove event.
             const selectedNodes = getSelectedNodes(this.editable);
-            const areCellContentsFullySelected = descendants(startTd).filter(d => !isBlock(d)).every(child => selectedNodes.includes(child));
+            const cellContents = descendants(startTd);
+            const areCellContentsFullySelected = cellContents.filter(d => !isBlock(d)).every(child => selectedNodes.includes(child));
             if (areCellContentsFullySelected) {
                 const SENSITIVITY = 5;
                 const rangeRect = range.getBoundingClientRect();
@@ -2672,8 +2673,8 @@ export class OdooEditor extends EventTarget {
                     this._selectTableCells(range);
                     appliedCustomSelection = true;
                 }
-            } else if (!isVisible(startTd) &&
-                ev.clientX - (this._lastMouseClickPosition ? this._lastMouseClickPosition[0] : ev.clientX) >= 15
+            } else if (cellContents.filter(isBlock).every(isEmptyBlock) &&
+                Math.abs(ev.clientX - (this._lastMouseClickPosition ? this._lastMouseClickPosition[0] : ev.clientX)) >= 15
             ) {
                 // Handle selecting an empty cell.
                 this._selectTableCells(range);
@@ -5186,11 +5187,27 @@ export class OdooEditor extends EventTarget {
     }
     _onTableMoveUpClick() {
         if (this._rowUiTarget.previousSibling) {
+            // When moving the second row up, copy the widths of first row's td
+            // elements to second row's td elements, as td widths are only
+            // applied to the first row.
+            if (!this._rowUiTarget.previousSibling.previousSibling) {
+                this._rowUiTarget.childNodes.forEach((cell, index) => {
+                    cell.style.width = this._rowUiTarget.previousSibling.childNodes[index].style.width;
+                });
+            }
             this._rowUiTarget.previousSibling.before(this._rowUiTarget);
         }
     }
     _onTableMoveDownClick() {
         if (this._rowUiTarget.nextSibling) {
+            // When moving the first row down, copy the widths of its td
+            // elements to second row's td elements, as td widths are only
+            // applied to the first row.
+            if (!this._rowUiTarget.previousSibling) {
+                this._rowUiTarget.nextSibling.childNodes.forEach((cell, index) => {
+                    cell.style.width = this._rowUiTarget.childNodes[index].style.width;
+                });
+            }
             this._rowUiTarget.nextSibling.after(this._rowUiTarget);
         }
     }

@@ -31,6 +31,7 @@ _ref_vat = {
     'be': 'BE0477472701',
     'bg': 'BG1234567892',
     'br': _('either 11 digits for CPF or 14 digits for CNPJ'),
+    'cr': _('3101012009'),
     'ch': _('CHE-123.456.788 TVA or CHE-123.456.788 MWST or CHE-123.456.788 IVA'),  # Swiss by Yannick Vaucher @ Camptocamp
     'cl': 'CL76086428-5',
     'co': _('CO213123432-1 or CO213.123.432-1'),
@@ -74,6 +75,7 @@ _ref_vat = {
     'sk': 'SK2022749619',
     'sm': 'SM24165',
     'tr': _('TR1234567890 (VERGINO) or TR17291716060 (TCKIMLIKNO)'),  # Levent Karakas @ Eska Yazilim A.S.
+    'uy': _("'219999830019' (should be 12 digits)"),
     've': 'V-12345678-1, V123456781, V-12.345.678-1',
     'xi': 'XI123456782',
     'sa': _('310175397400003 [Fifteen digits, first and last digits should be "3"]')
@@ -201,6 +203,7 @@ class ResPartner(models.Model):
                 partner.vies_valid = False
                 continue
             try:
+                _logger.info('Calling VIES service to check VAT for validation: %s', partner.vies_vat_to_check)
                 vies_valid = check_vies(partner.vies_vat_to_check, timeout=10)
                 partner.vies_valid = vies_valid['valid']
             except (OSError, InvalidComponent, zeep.exceptions.Fault) as e:
@@ -751,6 +754,16 @@ class ResPartner(models.Model):
         is_cnpj_valid = stdnum.get_cc_module('br', 'cnpj').is_valid
         return is_cpf_valid(vat) or is_cnpj_valid(vat)
 
+    __check_vat_cr_re = re.compile(r'^(?:[1-9]\d{8}|\d{10}|[1-9]\d{10,11})$')
+
+    def check_vat_cr(self, vat):
+        # CÉDULA FÍSICA: 9 digits
+        # CÉDULA JURÍDICA: 10 digits
+        # CÉDULA DIMEX: 11 or 12 digits
+        # CÉDULA NITE: 10 digits
+
+        return self.__check_vat_cr_re.match(vat) or False
+
     def format_vat_eu(self, vat):
         # Foreign companies that trade with non-enterprises in the EU
         # may have a VATIN starting with "EU" instead of a country code.
@@ -782,7 +795,7 @@ class ResPartner(models.Model):
         return is_valid_vat(vat) or is_valid_stnr(vat)
 
     def check_vat_il(self, vat):
-        check_func = stdnum.util.get_cc_module('il', 'hp').is_valid if self.is_company else stdnum.util.get_cc_module('il', 'idnr').is_valid
+        check_func = stdnum.util.get_cc_module('il', 'idnr').is_valid
         return check_func(vat)
 
     def format_vat_sm(self, vat):
