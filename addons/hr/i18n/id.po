@@ -1660,7 +1660,7 @@ msgstr "Status Kehadiran HR"
 #. module: hr
 #: model:ir.ui.menu,name:hr.menu_hr_main
 msgid "Human Resources"
-msgstr "Personalia"
+msgstr "Sumber Daya Manusia"
 
 #. module: hr
 #: model:hr.job,name:hr.job_hrm
@@ -1730,7 +1730,7 @@ msgid ""
 "If the active field is set to False, it will allow you to hide the resource "
 "record without removing it."
 msgstr ""
-"Jika kolom aktif diatur ke Salah, itu akan memungkinkan Anda untuk "
+"Jika kolom aktif diatur ke False, itu akan memungkinkan Anda untuk "
 "menyembunyikan data sumber daya tanpa menghapusnya."
 
 #. module: hr

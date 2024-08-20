@@ -2463,9 +2463,11 @@ msgstr "Công ty"
 
 #. module: mail
 #. odoo-javascript
+#. odoo-python
 #: code:addons/mail/static/src/js/activity.js:0
 #: code:addons/mail/static/src/models/composer_view.js:0
 #: code:addons/mail/static/src/models/mail_template.js:0
+#: code:addons/mail/wizard/mail_compose_message.py:0
 #: model:ir.actions.act_window,name:mail.action_email_compose_message_wizard
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 #, python-format
@@ -7787,7 +7789,7 @@ msgstr "Ngày đọc"
 #: code:addons/mail/static/src/components/message/message.js:0
 #, python-format
 msgid "Read Less"
-msgstr ""
+msgstr "Đọc ít hơn"
 
 #. module: mail
 #. odoo-javascript
@@ -10735,6 +10737,16 @@ msgid ""
 msgstr ""
 "Bạn có thể đính kèm các tập tin vào mẫu này để các tập tin đính kèm được gửi"
 " khi bạn gửi email dùng mẫu này"
+
+#. module: mail
+#: code:addons/mail/models/ir_attachment.py:0
+#, python-format
+msgid ""
+"You may not unlink or modify the content of attachments from other people's "
+"messages"
+msgstr ""
+"Bạn không được hủy liên kết hoặc sửa đổi nội dung tệp đính kèm khỏi nội dung"
+" của người khác"
 
 #. module: mail
 #. odoo-javascript

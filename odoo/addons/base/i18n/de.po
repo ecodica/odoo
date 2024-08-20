@@ -10280,7 +10280,7 @@ msgstr ""
 "\n"
 "Es unterstützt verschiedene Arten von Mitgliedern:\n"
 "--------------------------------------------------------------------------------\n"
-"    * Freie Mitglieder\n"
+"    * Kostenbefreite Mitglieder\n"
 "    * Verknüpfte Mitglieder\n"
 "    * Zahlende Mitglieder\n"
 "    * Spezielle Mitgliedspreise\n"
@@ -21126,6 +21126,13 @@ msgid "France - Accounting Reports"
 msgstr "Frankreich - Buchhaltungsberichte"
 
 #. module: base
+#: model:ir.module.module,shortdesc:base.module_l10n_fr_invoice_addr
+msgid "France - Adding Mandatory Invoice Mentions (Decree no. 2022-1299)"
+msgstr ""
+"Frankreich - Hinzufügen von Pflichtangaben auf Rechnunge (Dekret Nr. "
+"2022-1299)"
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_fec
 msgid "France - FEC Export"
 msgstr "Frankreich - FEC-Export"
@@ -25734,7 +25741,7 @@ msgstr "Sonstiges"
 #: model:res.partner.title,name:base.res_partner_title_miss
 #: model:res.partner.title,shortcut:base.res_partner_title_miss
 msgid "Miss"
-msgstr "Fr."
+msgstr "Fräulein"
 
 #. module: base
 #. odoo-python
@@ -35965,7 +35972,7 @@ msgstr "Timor-Leste"
 #: model:ir.model.fields,field_description:base.field_res_partner_title__name
 #: model:ir.model.fields,field_description:base.field_res_users__title
 msgid "Title"
-msgstr "Titel"
+msgstr "Anrede"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_sequence_date_range__date_to

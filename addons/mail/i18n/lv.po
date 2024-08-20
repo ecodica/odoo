@@ -2459,9 +2459,11 @@ msgstr "Uzņēmumi"
 
 #. module: mail
 #. odoo-javascript
+#. odoo-python
 #: code:addons/mail/static/src/js/activity.js:0
 #: code:addons/mail/static/src/models/composer_view.js:0
 #: code:addons/mail/static/src/models/mail_template.js:0
+#: code:addons/mail/wizard/mail_compose_message.py:0
 #: model:ir.actions.act_window,name:mail.action_email_compose_message_wizard
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 #, python-format
@@ -6476,7 +6478,7 @@ msgstr "Pieejamas nākamās aktivitātes"
 #: code:addons/mail/static/src/models/tracking_value_item.js:0
 #, python-format
 msgid "No"
-msgstr "Numurs"
+msgstr "No"
 
 #. module: mail
 #. odoo-python

@@ -14,7 +14,8 @@ def _reopen(self, res_id, model, context=None):
     # save original model in context, because selecting the list of available
     # templates requires a model in context
     context = dict(context or {}, default_model=model)
-    return {'type': 'ir.actions.act_window',
+    return {'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_id': res_id,
             'res_model': self._name,
@@ -629,6 +630,10 @@ class MailComposer(models.TransientModel):
                             'partner_ids', 'reply_to',
                             'attachment_ids', 'mail_server_id'
                            ] if key in default_values)
+
+        if template_id:  # Restore default sender if not updated on template switch (for both "mass_mail" and "comment" modes)
+            if 'email_from' not in values:
+                values['email_from'] = self.default_get(['email_from']).get('email_from')
 
         if values.get('body_html'):
             values['body'] = values.pop('body_html')

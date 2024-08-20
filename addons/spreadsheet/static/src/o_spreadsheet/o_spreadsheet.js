@@ -2298,8 +2298,11 @@
     /**
      * Create a range from a xc. If the xc is empty, this function returns undefined.
      */
-    function createRange(getters, sheetId, range) {
-        return range ? getters.getRangeFromSheetXC(sheetId, range) : undefined;
+    function createValidRange(getters, sheetId, xc) {
+        if (!xc)
+            return;
+        const range = getters.getRangeFromSheetXC(sheetId, xc);
+        return !(range.invalidSheetName || range.invalidXc) ? range : undefined;
     }
 
     /** Methods from Odoo Web Utils  */
@@ -3340,7 +3343,7 @@
          * Static helper which returns a successful DispatchResult
          */
         static get Success() {
-            return new DispatchResult();
+            return SUCCESS;
         }
         get isSuccessful() {
             return this.reasons.length === 0;
@@ -3353,6 +3356,7 @@
             return this.reasons.includes(reason);
         }
     }
+    const SUCCESS = new DispatchResult();
     exports.CommandResult = void 0;
     (function (CommandResult) {
         CommandResult[CommandResult["Success"] = 0] = "Success";
@@ -4020,6 +4024,7 @@
     }
 
     const macRegex = /Mac/i;
+    const MODIFIER_KEYS = ["Shift", "Control", "Alt", "Meta"];
     /**
      * Return true if the event was triggered from
      * a child element.
@@ -4038,6 +4043,31 @@
     function getOpenedMenus() {
         return Array.from(document.querySelectorAll(".o-spreadsheet .o-menu"));
     }
+    const letterRegex = /^[a-zA-Z]$/;
+    /**
+     * Transform a keyboard event into a shortcut string that represent this event. The letters keys will be uppercased.
+     *
+     * @argument ev - The keyboard event to transform
+     * @argument mode - Use either ev.key of ev.code to get the string shortcut
+     *
+     * @example
+     * event : { ctrlKey: true, key: "a" } => "Ctrl+A"
+     * event : { shift: true, alt: true, key: "Home" } => "Alt+Shift+Home"
+     */
+    function keyboardEventToShortcutString(ev, mode = "key") {
+        let keyDownString = "";
+        if (!MODIFIER_KEYS.includes(ev.key)) {
+            if (isCtrlKey(ev))
+                keyDownString += "Ctrl+";
+            if (ev.altKey)
+                keyDownString += "Alt+";
+            if (ev.shiftKey)
+                keyDownString += "Shift+";
+        }
+        const key = mode === "key" ? ev.key : ev.code;
+        keyDownString += letterRegex.test(key) ? key.toUpperCase() : key;
+        return keyDownString;
+    }
     function isMacOS() {
         return Boolean(macRegex.test(navigator.userAgent));
     }
@@ -4054,8 +4084,8 @@
      * Return the o-spreadsheet element position relative
      * to the browser viewport.
      */
-    function useSpreadsheetPosition() {
-        const position = owl.useState({ x: 0, y: 0 });
+    function useSpreadsheetRect() {
+        const position = owl.useState({ x: 0, y: 0, width: 0, height: 0 });
         let spreadsheetElement = document.querySelector(".o-spreadsheet");
         updatePosition();
         function updatePosition() {
@@ -4063,9 +4093,11 @@
                 spreadsheetElement = document.querySelector(".o-spreadsheet");
             }
             if (spreadsheetElement) {
-                const { top, left } = spreadsheetElement.getBoundingClientRect();
+                const { top, left, width, height } = spreadsheetElement.getBoundingClientRect();
                 position.x = left;
                 position.y = top;
+                position.width = width;
+                position.height = height;
             }
         }
         owl.onMounted(updatePosition);
@@ -4100,7 +4132,7 @@
     class Popover extends owl.Component {
         constructor() {
             super(...arguments);
-            this.spreadsheetPosition = useSpreadsheetPosition();
+            this.spreadsheetRect = useSpreadsheetRect();
         }
         get maxHeight() {
             return Math.max(0, this.viewportDimension.height - BOTTOMBAR_HEIGHT - SCROLLBAR_WIDTH);
@@ -4109,8 +4141,8 @@
             // the props's position is expressed relative to the "body" element
             // but we teleport the element in ".o-spreadsheet" to keep everything
             // within our control and to avoid leaking into external DOM
-            const horizontalPosition = `left:${this.horizontalPosition() - this.spreadsheetPosition.x}`;
-            const verticalPosition = `top:${this.verticalPosition() - this.spreadsheetPosition.y}`;
+            const horizontalPosition = `left:${this.horizontalPosition() - this.spreadsheetRect.x}`;
+            const verticalPosition = `top:${this.verticalPosition() - this.spreadsheetRect.y}`;
             const maxHeight = this.maxHeight;
             const height = `max-height:${maxHeight}`;
             const shadow = maxHeight !== 0 ? "box-shadow: 1px 2px 5px 2px rgb(51 51 51 / 15%);" : "";
@@ -6972,8 +7004,8 @@
         const dataSets = [];
         for (const sheetXC of dataSetsString) {
             const dataRange = getters.getRangeFromSheetXC(sheetId, sheetXC);
-            const { unboundedZone: zone, sheetId: dataSetSheetId, invalidSheetName } = dataRange;
-            if (invalidSheetName) {
+            const { unboundedZone: zone, sheetId: dataSetSheetId, invalidSheetName, invalidXc } = dataRange;
+            if (invalidSheetName || invalidXc) {
                 continue;
             }
             // It's a rectangle. We treat all columns (arbitrary) as different data series.
@@ -7366,7 +7398,7 @@
             super(definition, sheetId, getters);
             this.type = "bar";
             this.dataSets = createDataSets(getters, definition.dataSets, sheetId, definition.dataSetsHaveTitle);
-            this.labelRange = createRange(getters, sheetId, definition.labelRange);
+            this.labelRange = createValidRange(getters, sheetId, definition.labelRange);
             this.background = definition.background;
             this.verticalAxisPosition = definition.verticalAxisPosition;
             this.legendPosition = definition.legendPosition;
@@ -7662,7 +7694,7 @@
         constructor(definition, sheetId, getters) {
             super(definition, sheetId, getters);
             this.type = "gauge";
-            this.dataRange = createRange(this.getters, this.sheetId, definition.dataRange);
+            this.dataRange = createValidRange(this.getters, this.sheetId, definition.dataRange);
             this.sectionRule = definition.sectionRule;
             this.background = definition.background;
         }
@@ -7993,7 +8025,7 @@
             super(definition, sheetId, getters);
             this.type = "line";
             this.dataSets = createDataSets(this.getters, definition.dataSets, sheetId, definition.dataSetsHaveTitle);
-            this.labelRange = createRange(this.getters, sheetId, definition.labelRange);
+            this.labelRange = createValidRange(this.getters, sheetId, definition.labelRange);
             this.background = definition.background;
             this.verticalAxisPosition = definition.verticalAxisPosition;
             this.legendPosition = definition.legendPosition;
@@ -8219,15 +8251,6 @@
         }
         const colors = new ChartColors();
         for (let [index, { label, data }] of dataSetsValues.entries()) {
-            if (["linear", "time"].includes(axisType)) {
-                // Replace empty string labels by undefined to make sure chartJS doesn't decide that "" is the same as 0
-                data = data.map((y, index) => ({ x: labels[index] || undefined, y }));
-            }
-            const color = colors.next();
-            let backgroundRGBA = colorToRGBA(color);
-            if (chart.stacked) {
-                backgroundRGBA.a = LINE_FILL_TRANSPARENCY;
-            }
             if (chart.cumulative) {
                 let accumulator = 0;
                 data = data.map((value) => {
@@ -8237,6 +8260,15 @@
                     }
                     return value;
                 });
+            }
+            if (["linear", "time"].includes(axisType)) {
+                // Replace empty string labels by undefined to make sure chartJS doesn't decide that "" is the same as 0
+                data = data.map((y, index) => ({ x: labels[index] || undefined, y }));
+            }
+            const color = colors.next();
+            let backgroundRGBA = colorToRGBA(color);
+            if (chart.stacked) {
+                backgroundRGBA.a = LINE_FILL_TRANSPARENCY;
             }
             const backgroundColor = rgbaToHex(backgroundRGBA);
             const dataset = {
@@ -8267,7 +8299,7 @@
             super(definition, sheetId, getters);
             this.type = "pie";
             this.dataSets = createDataSets(getters, definition.dataSets, sheetId, definition.dataSetsHaveTitle);
-            this.labelRange = createRange(getters, sheetId, definition.labelRange);
+            this.labelRange = createValidRange(getters, sheetId, definition.labelRange);
             this.background = definition.background;
             this.legendPosition = definition.legendPosition;
         }
@@ -8425,8 +8457,8 @@
         constructor(definition, sheetId, getters) {
             super(definition, sheetId, getters);
             this.type = "scorecard";
-            this.keyValue = createRange(getters, sheetId, definition.keyValue);
-            this.baseline = createRange(getters, sheetId, definition.baseline);
+            this.keyValue = createValidRange(getters, sheetId, definition.keyValue);
+            this.baseline = createValidRange(getters, sheetId, definition.baseline);
             this.baselineMode = definition.baselineMode;
             this.baselineDescr = definition.baselineDescr;
             this.background = definition.background;
@@ -11343,7 +11375,7 @@
                 operand = descr;
             }
         }
-        if (isNumber(operand)) {
+        if (isNumber(operand) || isDateTime(operand)) {
             operand = toNumber(operand);
         }
         else if (operand === "TRUE" || operand === "FALSE") {
@@ -11359,6 +11391,9 @@
         return result;
     }
     function operandToRegExp(operand) {
+        if (operand === "*") {
+            return /.+/;
+        }
         let exp = "";
         let predecessor = "";
         for (let char of operand) {
@@ -11382,13 +11417,16 @@
         }
         return new RegExp("^" + exp + "$", "i");
     }
-    function evaluatePredicate(value, criterion) {
+    function evaluatePredicate(value = "", criterion) {
         const { operator, operand } = criterion;
-        if (value === undefined || operand === undefined) {
+        if (operand === undefined) {
             return false;
         }
         if (typeof operand === "number" && operator === "=") {
-            return toString(value) === toString(operand);
+            if (typeof value === "string" && (isNumber(value) || isDateTime(value))) {
+                return toNumber(value) === operand;
+            }
+            return value === operand;
         }
         if (operator === "<>" || operator === "=") {
             let result;
@@ -18373,6 +18411,147 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         return null;
     }
 
+    var State;
+    (function (State) {
+        /**
+         * Initial state.
+         * Expecting any reference for the left part of a range
+         * e.g. "A1", "1", "A", "Sheet1!A1", "Sheet1!A"
+         */
+        State[State["LeftRef"] = 0] = "LeftRef";
+        /**
+         * Expecting any reference for the right part of a range
+         * e.g. "A1", "1", "A", "Sheet1!A1", "Sheet1!A"
+         */
+        State[State["RightRef"] = 1] = "RightRef";
+        /**
+         * Expecting the separator without any constraint on the right part
+         */
+        State[State["Separator"] = 2] = "Separator";
+        /**
+         * Expecting the separator for a full column range
+         */
+        State[State["FullColumnSeparator"] = 3] = "FullColumnSeparator";
+        /**
+         * Expecting the separator for a full row range
+         */
+        State[State["FullRowSeparator"] = 4] = "FullRowSeparator";
+        /**
+         * Expecting the right part of a full column range
+         * e.g. "1", "A1"
+         */
+        State[State["RightColumnRef"] = 5] = "RightColumnRef";
+        /**
+         * Expecting the right part of a full row range
+         * e.g. "A", "A1"
+         */
+        State[State["RightRowRef"] = 6] = "RightRowRef";
+        /**
+         * Final state. A range has been matched
+         */
+        State[State["Found"] = 7] = "Found";
+    })(State || (State = {}));
+    const goTo = (state, guard = () => true) => [
+        {
+            goTo: state,
+            guard,
+        },
+    ];
+    const goToMulti = (state, guard = () => true) => ({
+        goTo: state,
+        guard,
+    });
+    const machine = {
+        [State.LeftRef]: {
+            REFERENCE: goTo(State.Separator),
+            NUMBER: goTo(State.FullRowSeparator),
+            SYMBOL: [
+                goToMulti(State.FullColumnSeparator, (token) => isColReference(token.value)),
+                goToMulti(State.FullRowSeparator, (token) => isRowReference(token.value)),
+            ],
+        },
+        [State.FullColumnSeparator]: {
+            SPACE: goTo(State.FullColumnSeparator),
+            OPERATOR: goTo(State.RightColumnRef, (token) => token.value === ":"),
+        },
+        [State.FullRowSeparator]: {
+            SPACE: goTo(State.FullRowSeparator),
+            OPERATOR: goTo(State.RightRowRef, (token) => token.value === ":"),
+        },
+        [State.Separator]: {
+            SPACE: goTo(State.Separator),
+            OPERATOR: goTo(State.RightRef, (token) => token.value === ":"),
+        },
+        [State.RightRef]: {
+            SPACE: goTo(State.RightRef),
+            NUMBER: goTo(State.Found),
+            REFERENCE: goTo(State.Found, (token) => isSingleCellReference(token.value)),
+            SYMBOL: goTo(State.Found, (token) => isColHeader(token.value) || isRowHeader(token.value)),
+        },
+        [State.RightColumnRef]: {
+            SPACE: goTo(State.RightColumnRef),
+            SYMBOL: goTo(State.Found, (token) => isColHeader(token.value)),
+            REFERENCE: goTo(State.Found, (token) => isSingleCellReference(token.value)),
+        },
+        [State.RightRowRef]: {
+            SPACE: goTo(State.RightRowRef),
+            NUMBER: goTo(State.Found),
+            REFERENCE: goTo(State.Found, (token) => isSingleCellReference(token.value)),
+            SYMBOL: goTo(State.Found, (token) => isRowHeader(token.value)),
+        },
+        [State.Found]: {},
+    };
+    /**
+     * Check if the list of tokens starts with a sequence of tokens representing
+     * a range.
+     * If a range is found, the sequence is removed from the list and is returned
+     * as a single token.
+     */
+    function matchReference(tokens) {
+        var _a;
+        let head = 0;
+        let transitions = machine[State.LeftRef];
+        let matchedTokens = "";
+        while (transitions !== undefined) {
+            const token = tokens[head++];
+            if (!token) {
+                return null;
+            }
+            const transition = (_a = transitions[token.type]) === null || _a === void 0 ? void 0 : _a.find((transition) => transition.guard(token));
+            const nextState = transition ? transition.goTo : undefined;
+            switch (nextState) {
+                case undefined:
+                    return null;
+                case State.Found:
+                    matchedTokens += token.value;
+                    tokens.splice(0, head);
+                    return {
+                        type: "REFERENCE",
+                        value: matchedTokens,
+                    };
+                default:
+                    transitions = machine[nextState];
+                    matchedTokens += token.value;
+                    break;
+            }
+        }
+        return null;
+    }
+    /**
+     * Take the result of the tokenizer and transform it to be usable in the
+     * manipulations of range
+     *
+     * @param formula
+     */
+    function rangeTokenize(formula) {
+        const tokens = tokenize(formula);
+        const result = [];
+        while (tokens.length) {
+            result.push(matchReference(tokens) || tokens.shift());
+        }
+        return result;
+    }
+
     const functionRegex = /[a-zA-Z0-9\_]+(\.[a-zA-Z0-9\_]+)*/;
     const UNARY_OPERATORS_PREFIX = ["-", "+"];
     const UNARY_OPERATORS_POSTFIX = ["%"];
@@ -18539,11 +18718,11 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
      * Parse an expression (as a string) into an AST.
      */
     function parse(str) {
-        return parseTokens(tokenize(str));
+        return parseTokens(rangeTokenize(str));
     }
     function parseTokens(tokens) {
         tokens = tokens.filter((x) => x.type !== "SPACE");
-        if (tokens[0].type === "OPERATOR" && tokens[0].value === "=") {
+        if (tokens[0] && tokens[0].type === "OPERATOR" && tokens[0].value === "=") {
             tokens.splice(0, 1);
         }
         const result = parseExpression(tokens, 0);
@@ -18649,147 +18828,6 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             needParenthesis = true;
         }
         return needParenthesis ? `(${astToFormula(rightOperation)})` : astToFormula(rightOperation);
-    }
-
-    var State;
-    (function (State) {
-        /**
-         * Initial state.
-         * Expecting any reference for the left part of a range
-         * e.g. "A1", "1", "A", "Sheet1!A1", "Sheet1!A"
-         */
-        State[State["LeftRef"] = 0] = "LeftRef";
-        /**
-         * Expecting any reference for the right part of a range
-         * e.g. "A1", "1", "A", "Sheet1!A1", "Sheet1!A"
-         */
-        State[State["RightRef"] = 1] = "RightRef";
-        /**
-         * Expecting the separator without any constraint on the right part
-         */
-        State[State["Separator"] = 2] = "Separator";
-        /**
-         * Expecting the separator for a full column range
-         */
-        State[State["FullColumnSeparator"] = 3] = "FullColumnSeparator";
-        /**
-         * Expecting the separator for a full row range
-         */
-        State[State["FullRowSeparator"] = 4] = "FullRowSeparator";
-        /**
-         * Expecting the right part of a full column range
-         * e.g. "1", "A1"
-         */
-        State[State["RightColumnRef"] = 5] = "RightColumnRef";
-        /**
-         * Expecting the right part of a full row range
-         * e.g. "A", "A1"
-         */
-        State[State["RightRowRef"] = 6] = "RightRowRef";
-        /**
-         * Final state. A range has been matched
-         */
-        State[State["Found"] = 7] = "Found";
-    })(State || (State = {}));
-    const goTo = (state, guard = () => true) => [
-        {
-            goTo: state,
-            guard,
-        },
-    ];
-    const goToMulti = (state, guard = () => true) => ({
-        goTo: state,
-        guard,
-    });
-    const machine = {
-        [State.LeftRef]: {
-            REFERENCE: goTo(State.Separator),
-            NUMBER: goTo(State.FullRowSeparator),
-            SYMBOL: [
-                goToMulti(State.FullColumnSeparator, (token) => isColReference(token.value)),
-                goToMulti(State.FullRowSeparator, (token) => isRowReference(token.value)),
-            ],
-        },
-        [State.FullColumnSeparator]: {
-            SPACE: goTo(State.FullColumnSeparator),
-            OPERATOR: goTo(State.RightColumnRef, (token) => token.value === ":"),
-        },
-        [State.FullRowSeparator]: {
-            SPACE: goTo(State.FullRowSeparator),
-            OPERATOR: goTo(State.RightRowRef, (token) => token.value === ":"),
-        },
-        [State.Separator]: {
-            SPACE: goTo(State.Separator),
-            OPERATOR: goTo(State.RightRef, (token) => token.value === ":"),
-        },
-        [State.RightRef]: {
-            SPACE: goTo(State.RightRef),
-            NUMBER: goTo(State.Found),
-            REFERENCE: goTo(State.Found, (token) => isSingleCellReference(token.value)),
-            SYMBOL: goTo(State.Found, (token) => isColHeader(token.value) || isRowHeader(token.value)),
-        },
-        [State.RightColumnRef]: {
-            SPACE: goTo(State.RightColumnRef),
-            SYMBOL: goTo(State.Found, (token) => isColHeader(token.value)),
-            REFERENCE: goTo(State.Found, (token) => isSingleCellReference(token.value)),
-        },
-        [State.RightRowRef]: {
-            SPACE: goTo(State.RightRowRef),
-            NUMBER: goTo(State.Found),
-            REFERENCE: goTo(State.Found, (token) => isSingleCellReference(token.value)),
-            SYMBOL: goTo(State.Found, (token) => isRowHeader(token.value)),
-        },
-        [State.Found]: {},
-    };
-    /**
-     * Check if the list of tokens starts with a sequence of tokens representing
-     * a range.
-     * If a range is found, the sequence is removed from the list and is returned
-     * as a single token.
-     */
-    function matchReference(tokens) {
-        var _a;
-        let head = 0;
-        let transitions = machine[State.LeftRef];
-        let matchedTokens = "";
-        while (transitions !== undefined) {
-            const token = tokens[head++];
-            if (!token) {
-                return null;
-            }
-            const transition = (_a = transitions[token.type]) === null || _a === void 0 ? void 0 : _a.find((transition) => transition.guard(token));
-            const nextState = transition ? transition.goTo : undefined;
-            switch (nextState) {
-                case undefined:
-                    return null;
-                case State.Found:
-                    matchedTokens += token.value;
-                    tokens.splice(0, head);
-                    return {
-                        type: "REFERENCE",
-                        value: matchedTokens,
-                    };
-                default:
-                    transitions = machine[nextState];
-                    matchedTokens += token.value;
-                    break;
-            }
-        }
-        return null;
-    }
-    /**
-     * Take the result of the tokenizer and transform it to be usable in the
-     * manipulations of range
-     *
-     * @param formula
-     */
-    function rangeTokenize(formula) {
-        const tokens = tokenize(formula);
-        const result = [];
-        while (tokens.length) {
-            result.push(matchReference(tokens) || tokens.shift());
-        }
-        return result;
     }
 
     const functions$2 = functionRegistry.content;
@@ -20397,6 +20435,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         constructor() {
             super(...arguments);
             this.composerRef = owl.useRef("o_composer");
+            this.spreadsheetRect = useSpreadsheetRect();
             this.contentHelper = new ContentEditableHelper(this.composerRef.el);
             this.composerState = owl.useState({
                 positionStart: 0,
@@ -20432,24 +20471,28 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             };
         }
         get assistantStyle() {
+            const composerRect = this.composerRef.el.getBoundingClientRect();
+            const assistantStyle = {
+                width: `${ASSISTANT_WIDTH}px`,
+            };
             if (this.props.delimitation && this.props.rect) {
                 const { x: cellX, y: cellY, height: cellHeight } = this.props.rect;
                 const remainingHeight = this.props.delimitation.height - (cellY + cellHeight);
-                let assistantStyle = "";
                 if (cellY > remainingHeight) {
                     // render top
-                    assistantStyle += `
-          top: -8px;
-          transform: translate(0, -100%);
-        `;
+                    assistantStyle.top = "-8px";
+                    assistantStyle.transform = "translate(0, -100%)";
                 }
                 if (cellX + ASSISTANT_WIDTH > this.props.delimitation.width) {
                     // render left
-                    assistantStyle += `right:0px;`;
+                    assistantStyle.right = "0px";
                 }
-                return (assistantStyle += `width:${ASSISTANT_WIDTH}px;`);
+                return cssPropertiesToCss(assistantStyle);
             }
-            return `width:${ASSISTANT_WIDTH}px;`;
+            if (composerRect.left + ASSISTANT_WIDTH > this.spreadsheetRect.width) {
+                assistantStyle.right = "0px";
+            }
+            return cssPropertiesToCss(assistantStyle);
         }
         setup() {
             owl.onMounted(() => {
@@ -20579,7 +20622,14 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         }
         onPaste(ev) {
             if (this.env.model.getters.getEditionMode() !== "inactive") {
+                // let the browser clipboard work
                 ev.stopPropagation();
+            }
+            else {
+                // the user meant to paste in the sheet, not open the composer with the pasted content
+                // While we're not editing, we still have the focus and should therefore prevent
+                // the native "paste" to occur.
+                ev.preventDefault();
             }
         }
         /*
@@ -20588,10 +20638,6 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         onInput(ev) {
             var _a, _b;
             if (!this.shouldProcessInputEvents) {
-                return;
-            }
-            if (ev.inputType === "insertFromPaste" &&
-                this.env.model.getters.getEditionMode() === "inactive") {
                 return;
             }
             ev.stopPropagation();
@@ -20910,10 +20956,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         }
         get containerStyle() {
             if (this.env.model.getters.getEditionMode() === "inactive" || !this.rect) {
-                return `
-        position: absolute;
-        z-index: -1000;
-      `;
+                return `z-index: -1000;`;
             }
             const isFormula = this.env.model.getters.getCurrentContent().startsWith("=");
             const cell = this.env.model.getters.getActiveCell();
@@ -21199,7 +21242,8 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         }
         onKeyDown(ev) {
             const figure = this.props.figure;
-            switch (ev.key) {
+            const keyDownShortcut = keyboardEventToShortcutString(ev);
+            switch (keyDownShortcut) {
                 case "Delete":
                     this.env.model.dispatch("DELETE_FIGURE", {
                         sheetId: this.env.model.getters.getActiveSheetId(),
@@ -21226,6 +21270,22 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                         x: figure.x + delta[0],
                         y: figure.y + delta[1],
                     });
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    break;
+                case "Ctrl+A":
+                    // Maybe in the future we will implement a way to select all figures
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    break;
+                case "Ctrl+Y":
+                case "Ctrl+Z":
+                    if (keyDownShortcut === "Ctrl+Y") {
+                        this.env.model.dispatch("REQUEST_REDO");
+                    }
+                    else if (keyDownShortcut === "Ctrl+Z") {
+                        this.env.model.dispatch("REQUEST_UNDO");
+                    }
                     ev.preventDefault();
                     ev.stopPropagation();
                     break;
@@ -21367,7 +21427,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             return containers;
         }
         getContainerStyle(container) {
-            const { width: viewWidth, height: viewHeight } = this.env.model.getters.getMainViewportRect();
+            const { width: viewWidth, height: viewHeight } = this.env.model.getters.getSheetViewDimension();
             const { x: viewportX, y: viewportY } = this.env.model.getters.getMainViewportCoordinates();
             const left = ["bottomRight", "topRight"].includes(container) ? viewportX : 0;
             const width = viewWidth - left;
@@ -21570,10 +21630,13 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             row: undefined,
         };
         const { Date } = window;
-        let x = 0;
-        let y = 0;
+        let x = undefined;
+        let y = undefined;
         let lastMoved = 0;
         function getPosition() {
+            if (x === undefined || y === undefined) {
+                return { col: -1, row: -1 };
+            }
             const col = env.model.getters.getColIndex(x);
             const row = env.model.getters.getRowIndex(y);
             return { col, row };
@@ -23251,15 +23314,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     }
     class LinkCell extends AbstractCell {
         constructor(id, content, properties = {}) {
-            var _a;
             const link = parseMarkdownLink(content);
-            properties = {
-                ...properties,
-                style: {
-                    ...properties.style,
-                    textColor: ((_a = properties.style) === null || _a === void 0 ? void 0 : _a.textColor) || LINK_COLOR,
-                },
-            };
             link.label = _t(link.label);
             super(id, lazy({ value: link.label, type: CellValueType.text }), properties);
             this.link = link;
@@ -23644,6 +23699,8 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "BITOR",
         "BITRSHIFT",
         "BITXOR",
+        "BYCOL",
+        "BYROW",
         "CEILING.MATH",
         "CEILING.PRECISE",
         "CHISQ.DIST",
@@ -23651,6 +23708,8 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "CHISQ.INV",
         "CHISQ.INV.RT",
         "CHISQ.TEST",
+        "CHOOSECOLS",
+        "CHOOSEROWS",
         "COMBINA",
         "CONCAT",
         "CONFIDENCE.NORM",
@@ -23663,14 +23722,17 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "CSCH",
         "DAYS",
         "DECIMAL",
+        "DROP",
         "ERF.PRECISE",
         "ERFC.PRECISE",
+        "EXPAND",
         "EXPON.DIST",
         "F.DIST",
         "F.DIST.RT",
         "F.INV",
         "F.INV.RT",
         "F.TEST",
+        "FIELDVALUE",
         "FILTERXML",
         "FLOOR.MATH",
         "FLOOR.PRECISE",
@@ -23685,6 +23747,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "GAMMA.INV",
         "GAMMALN.PRECISE",
         "GAUSS",
+        "HSTACK",
         "HYPGEOM.DIST",
         "IFNA",
         "IFS",
@@ -23697,9 +23760,14 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "IMSINH",
         "IMTAN",
         "ISFORMULA",
+        "ISOMITTED",
         "ISOWEEKNUM",
+        "LAMBDA",
+        "LET",
         "LOGNORM.DIST",
         "LOGNORM.INV",
+        "MAKEARRAY",
+        "MAP",
         "MAXIFS",
         "MINIFS",
         "MODE.MULT",
@@ -23719,17 +23787,26 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "PERMUTATIONA",
         "PHI",
         "POISSON.DIST",
+        "PQSOURCE",
+        "PYTHON_STR",
+        "PYTHON_TYPE",
+        "PYTHON_TYPENAME",
         "QUARTILE.EXC",
         "QUARTILE.INC",
         "QUERYSTRING",
+        "RANDARRAY",
         "RANK.AVG",
         "RANK.EQ",
+        "REDUCE",
         "RRI",
+        "SCAN",
         "SEC",
         "SECH",
+        "SEQUENCE",
         "SHEET",
         "SHEETS",
         "SKEW.P",
+        "SORTBY",
         "STDEV.P",
         "STDEV.S",
         "SWITCH",
@@ -23739,13 +23816,24 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         "T.INV",
         "T.INV.2T",
         "T.TEST",
+        "TAKE",
+        "TEXTAFTER",
+        "TEXTBEFORE",
         "TEXTJOIN",
+        "TEXTSPLIT",
+        "TOCOL",
+        "TOROW",
         "UNICHAR",
         "UNICODE",
+        "UNIQUE",
         "VAR.P",
         "VAR.S",
+        "VSTACK",
         "WEBSERVICE",
         "WEIBULL.DIST",
+        "WRAPCOLS",
+        "WRAPROWS",
+        "XLOOKUP",
         "XOR",
         "Z.TEST",
     ];
@@ -27388,12 +27476,13 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                     this.clearBorders(cmd.sheetId, cmd.target);
                     break;
                 case "REMOVE_COLUMNS_ROWS":
-                    for (let el of [...cmd.elements].sort((a, b) => b - a)) {
+                    const elements = [...cmd.elements].sort((a, b) => b - a);
+                    for (const group of groupConsecutive(elements)) {
                         if (cmd.dimension === "COL") {
-                            this.shiftBordersHorizontally(cmd.sheetId, el + 1, -1);
+                            this.shiftBordersHorizontally(cmd.sheetId, group[group.length - 1] + 1, -group.length);
                         }
                         else {
-                            this.shiftBordersVertically(cmd.sheetId, el + 1, -1);
+                            this.shiftBordersVertically(cmd.sheetId, group[group.length - 1] + 1, -group.length);
                         }
                     }
                     break;
@@ -27533,6 +27622,22 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             return Object.keys(sheetBorders).map((index) => parseInt(index, 10));
         }
         /**
+         * Get all the rows which contains at least a border
+         */
+        getRowsWithBorders(sheetId) {
+            var _a;
+            const sheetBorders = (_a = this.borders[sheetId]) === null || _a === void 0 ? void 0 : _a.filter(isDefined$1);
+            if (!sheetBorders)
+                return [];
+            const rowsWithBorders = new Set();
+            for (const rowBorders of sheetBorders) {
+                for (const rowBorder in rowBorders) {
+                    rowsWithBorders.add(parseInt(rowBorder, 10));
+                }
+            }
+            return Array.from(rowsWithBorders);
+        }
+        /**
          * Get the range of all the rows in the sheet
          */
         getRowsRange(sheetId) {
@@ -27581,7 +27686,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                     destructive: false,
                 });
             }
-            this.getRowsRange(sheetId)
+            this.getRowsWithBorders(sheetId)
                 .filter((row) => row >= start)
                 .sort((a, b) => (delta < 0 ? a - b : b - a)) // start by the end when moving up
                 .forEach((row) => {
@@ -27825,6 +27930,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     BordersPlugin.getters = ["getCellBorder"];
 
     const nbspRegexp = new RegExp(String.fromCharCode(160), "g");
+    const LINK_STYLE = { textColor: LINK_COLOR };
     /**
      * Core Plugin
      *
@@ -28059,7 +28165,11 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             return this.buildFormulaContent(sheetId, cell);
         }
         getCellStyle(cell) {
-            return (cell && cell.style) || {};
+            if (!cell) {
+                return {};
+            }
+            const linkStyle = cell.isLink() ? LINK_STYLE : {};
+            return { ...linkStyle, ...cell.style };
         }
         /**
          * Converts a zone to a XC coordinate system
@@ -30869,12 +30979,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                             });
                         }
                         if (colIndex > deletedColumn) {
-                            this.dispatch("UPDATE_CELL_POSITION", {
-                                sheetId: sheet.id,
-                                cellId: cellId,
-                                col: colIndex - 1,
-                                row: rowIndex,
-                            });
+                            this.setNewPosition(cellId, sheet.id, colIndex - 1, rowIndex);
                         }
                     }
                 }
@@ -30884,7 +30989,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
          * Move the cells after a column or rows insertion
          */
         moveCellsOnAddition(sheet, addedElement, quantity, dimension) {
-            const commands = [];
+            const updates = [];
             for (let rowIndex = 0; rowIndex < sheet.rows.length; rowIndex++) {
                 const row = sheet.rows[rowIndex];
                 if (dimension !== "rows" || rowIndex >= addedElement) {
@@ -30893,20 +30998,20 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                         const cellId = row.cells[i];
                         if (cellId) {
                             if (dimension === "rows" || colIndex >= addedElement) {
-                                commands.push({
-                                    type: "UPDATE_CELL_POSITION",
+                                updates.push({
                                     sheetId: sheet.id,
                                     cellId: cellId,
                                     col: colIndex + (dimension === "columns" ? quantity : 0),
                                     row: rowIndex + (dimension === "rows" ? quantity : 0),
+                                    type: "UPDATE_CELL_POSITION",
                                 });
                             }
                         }
                     }
                 }
             }
-            for (let cmd of commands.reverse()) {
-                this.dispatch(cmd.type, cmd);
+            for (let update of updates.reverse()) {
+                this.updateCellPosition(update);
             }
         }
         /**
@@ -30939,12 +31044,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                         const colIndex = Number(i);
                         const cellId = row.cells[i];
                         if (cellId) {
-                            this.dispatch("UPDATE_CELL_POSITION", {
-                                sheetId: sheet.id,
-                                cellId: cellId,
-                                col: colIndex,
-                                row: rowIndex - numberRows,
-                            });
+                            this.setNewPosition(cellId, sheet.id, colIndex, rowIndex - numberRows);
                         }
                     }
                 }
@@ -40570,7 +40670,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
          * @param sheetXC the string description of a range, in the form SheetName!XC:XC
          */
         getRangeFromSheetXC(defaultSheetId, sheetXC) {
-            if (!rangeReference.test(sheetXC)) {
+            if (!rangeReference.test(sheetXC) || !this.getters.tryGetSheet(defaultSheetId)) {
                 return new RangeImpl({
                     sheetId: "",
                     zone: { left: -1, top: -1, right: -1, bottom: -1 },
@@ -40627,6 +40727,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             }
             if (range.invalidXc) {
                 return range.invalidXc;
+            }
+            if (!this.getters.tryGetSheet(range.sheetId)) {
+                return INCORRECT_RANGE_STRING;
             }
             if (range.zone.bottom - range.zone.top < 0 || range.zone.right - range.zone.left < 0) {
                 return INCORRECT_RANGE_STRING;
@@ -41766,6 +41869,12 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         else {
             // Shouldn't we always output the value then ?
             const value = cell.value;
+            // If the cell contains a non-exported formula and that is evaluates to
+            // nothing* ,we don't export it.
+            // * non-falsy value are relevant and so are 0 and FALSE, which only leaves
+            // the empty string.
+            if (value === "")
+                return undefined;
             const type = getCellType(value);
             attrs.push(["t", type]);
             node = escapeXml /*xml*/ `<v>${value}</v>`;
@@ -42488,7 +42597,11 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                     let cellNode = escapeXml ``;
                     // Either formula or static value inside the cell
                     if (cell.isFormula) {
-                        ({ attrs: additionalAttrs, node: cellNode } = addFormula(cell));
+                        const res = addFormula(cell);
+                        if (!res) {
+                            continue;
+                        }
+                        ({ attrs: additionalAttrs, node: cellNode } = res);
                     }
                     else if (cell.content && isMarkdownLink(cell.content)) {
                         const { label } = parseMarkdownLink(cell.content);
@@ -43272,6 +43385,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         rgbaToHex,
         colorToRGBA,
         positionToZone,
+        deepEquals,
     };
     const components = {
         ChartPanel,
@@ -43326,9 +43440,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     Object.defineProperty(exports, '__esModule', { value: true });
 
 
-    __info__.version = '16.0.42';
-    __info__.date = '2024-05-24T11:34:45.051Z';
-    __info__.hash = 'fd11d19';
+    __info__.version = '16.0.51';
+    __info__.date = '2024-08-19T08:14:53.311Z';
+    __info__.hash = '2b60022';
 
 
 })(this.o_spreadsheet = this.o_spreadsheet || {}, owl);

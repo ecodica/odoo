@@ -5,7 +5,7 @@ import collections
 from datetime import timedelta
 from itertools import groupby
 import operator as py_operator
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.tools import groupby
 from odoo.tools.float_utils import float_round, float_is_zero
 
@@ -43,8 +43,9 @@ class ProductTemplate(models.Model):
         for product in self:
             product.bom_count = self.env['mrp.bom'].search_count(['|', ('product_tmpl_id', '=', product.id), ('byproduct_ids.product_id.product_tmpl_id', '=', product.id)])
 
+    @api.depends_context('company')
     def _compute_is_kits(self):
-        domain = [('company_id', 'in', [False] + self.env.companies.ids),
+        domain = [('company_id', 'in', [False, self.env.company.id]),
                   ('product_tmpl_id', 'in', self.ids),
                   ('active', '=', True),
                   ('type', '=', 'phantom')]
@@ -141,9 +142,10 @@ class ProductProduct(models.Model):
         for product in self:
             product.bom_count = self.env['mrp.bom'].search_count(['|', '|', ('byproduct_ids.product_id', '=', product.id), ('product_id', '=', product.id), '&', ('product_id', '=', False), ('product_tmpl_id', '=', product.product_tmpl_id.id)])
 
+    @api.depends_context('company')
     def _compute_is_kits(self):
         domain = [
-            '&', ('company_id', 'in', [False] + self.env.companies.ids),
+            '&', ('company_id', 'in', [False, self.env.company.id]),
             '&', ('active', '=', True),
             '&', ('type', '=', 'phantom'),
             '|', ('product_id', 'in', self.ids),
@@ -348,6 +350,15 @@ class ProductProduct(models.Model):
         warehouse = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
         for product in self:
             bom_data = self.env['report.mrp.report_bom_structure'].with_context(minimized=True)._get_bom_data(bom_by_products[product], warehouse, product, ignore_stock=True)
+            if bom_data.get('availability_state') == 'unavailable' and not bom_data.get('components_available', True):
+                return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Cannot compute days to prepare due to missing route info for at least 1 component or for the final product.'),
+                    'sticky': False,
+                    }
+                }
             availability_delay = bom_data.get('resupply_avail_delay')
             product.days_to_prepare_mo = availability_delay - bom_data.get('lead_time', 0) if availability_delay else 0
 

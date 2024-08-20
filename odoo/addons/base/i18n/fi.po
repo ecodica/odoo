@@ -17,10 +17,10 @@
 # Joni Winsten, 2022
 # Joakim Weckman, 2022
 # Tommi Rintala <tommi.rintala@gmail.com>, 2022
+# Simo Suurla <simo@suurla.fi>, 2022
 # Erno Iipponen <erno.iipponen@web-veistamo.fi>, 2022
 # Retropikzel, 2022
 # Mikko Virtanen <mikko.virtanen2013@gmail.com>, 2022
-# Simo Suurla <simo@suurla.fi>, 2022
 # Miika Nissi <miika.nissi@tawasta.fi>, 2022
 # Pekko Tuomisto <pekko.tuomisto@web-veistamo.fi>, 2022
 # Eino Mäkitalo <eino.makitalo@netitbe.fi>, 2022
@@ -39,6 +39,7 @@
 # Richard Mouthier <rmo@odoo.com>, 2024
 # Martin Trigaux, 2024
 # Jarmo Kortetjärvi <jarmo.kortetjarvi@gmail.com>, 2024
+# Larissa Manderfeld, 2024
 # Ossi Mantylahti <ossi.mantylahti@obs-solutions.fi>, 2024
 # 
 msgid ""
@@ -21246,6 +21247,12 @@ msgid "France - Accounting Reports"
 msgstr "Ranska - Kirjanpitoraportit"
 
 #. module: base
+#: model:ir.module.module,shortdesc:base.module_l10n_fr_invoice_addr
+msgid "France - Adding Mandatory Invoice Mentions (Decree no. 2022-1299)"
+msgstr ""
+"Ranska - Pakollisten mainintojen lisääminen laskuun (asetus nro 2022-1299)"
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_fec
 msgid "France - FEC Export"
 msgstr "Ranska - FEC Export"
@@ -30559,7 +30566,7 @@ msgstr "Yksityisyys"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__res_partner__type__private
 msgid "Private Address"
-msgstr "Kotiosoite"
+msgstr "Yksityinen osoite"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.res_partner_view_form_private

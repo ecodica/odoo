@@ -138,7 +138,9 @@ class TestHttpStatic(TestHttpStaticCommon):
         res = self.db_url_open('/web/content/test_http.rickroll')
         res.raise_for_status()
         self.assertEqual(res.status_code, 301)
-        self.assertEqual(res.headers.get('Location'), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+        self.assertURLEqual(
+            res.headers.get('Location'),
+            'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 
     def test_static08_binary_field_attach(self):
         earth = self.env.ref('test_http.earth')
@@ -316,6 +318,58 @@ class TestHttpStatic(TestHttpStaticCommon):
         location = parse_url(res.headers.get('Location', ''))
         self.assertNotEqual(location.path, bad_path, "loop detected")
         self.assertEqual(res.status_code, 404)
+
+    def test_static20_download_false(self):
+        self.assertDownloadGizeh('/web/content/test_http.gizeh_png?download=0')
+        self.assertDownloadGizeh('/web/image/test_http.gizeh_png?download=0')
+
+    def test_static21_web_assets(self):
+        attachment = self.env['ir.attachment'].search([
+            ('url', 'like', '%/web.assets_frontend_minimal.min.js')
+        ], limit=1)
+        x_sendfile = opj(config.filestore(self.env.cr.dbname), attachment.store_fname)
+        x_accel_redirect = f'/web/filestore/{self.env.cr.dbname}/{attachment.store_fname}'
+
+        with self.subTest(x_sendfile=False):
+            self.assertDownload(
+                attachment.url,
+                headers={},
+                assert_status_code=200,
+                assert_headers={
+                    'Content-Length': str(attachment.file_size),
+                    'Content-Type': 'application/javascript; charset=utf-8',
+                    'Content-Disposition': 'inline; filename=web.assets_frontend_minimal.min.js',
+                },
+                assert_content=attachment.raw
+            )
+
+        with self.subTest(x_sendfile=True), \
+             patch.object(config, 'options', {**config.options, 'x_sendfile': True}):
+            self.assertDownload(
+                attachment.url,
+                headers={},
+                assert_status_code=200,
+                assert_headers={
+                    'X-Sendfile': x_sendfile,
+                    'X-Accel-Redirect': x_accel_redirect,
+                    'Content-Length': '0',
+                    'Content-Type': 'application/javascript; charset=utf-8',
+                    'Content-Disposition': 'inline; filename=web.assets_frontend_minimal.min.js',
+                },
+            )
+
+    def test_static22_image_field_csp(self):
+        test_user = new_test_user(self.env, "test user")
+        env = self.env(user=test_user)
+        self.authenticate('test user', 'test user')
+        earth = env.ref('test_http.earth')
+
+        data = base64.b64encode(b'<html><body><div>Hello World</div></body></html>')
+        for field in ('glyph_attach', 'glyph_inline', 'glyph_related', 'glyph_compute'):
+            earth[field] = data
+            res = self.url_open(f'/web/image/test_http.stargate/{earth.id}/{field}')
+            self.assertEqual(res.headers['Content-Type'], 'application/octet-stream')  # Shouldn't be text/html
+            self.assertEqual(res.headers['Content-Security-Policy'], "default-src 'none'")
 
 
 @tagged('post_install', '-at_install')
@@ -500,3 +554,27 @@ class TestHttpStaticCache(TestHttpStaticCommon):
         })
         res_etag.raise_for_status()
         self.assertEqual(res_etag.status_code, 304, "We should not download the file again.")
+
+    @freeze_time(datetime.utcnow())
+    def test_static_cache3_private(self):
+        gizeh_png = self.env.ref('test_http.gizeh_png')
+        gizeh_png.public = False
+        url = '/web/image/test_http.gizeh_png'
+
+        # Visitor must get a placeholder
+        self.authenticate(None, None)
+        res_visitor = self.assertDownloadPlaceholder(url)
+        self.assertEqual(res_visitor.headers.get('Cache-Control', ''), 'no-cache, private')
+        self.assertTrue(res_visitor.headers.get('ETag'))
+        res_visitor_etag = self.db_url_open(url, headers={
+            'If-None-Match': res_visitor.headers['ETag']
+        })
+        self.assertEqual(res_visitor_etag.status_code, 304, "The visitor should use its cache")
+
+        # Admin can get the actual image
+        self.authenticate('admin', 'admin')
+        res = self.assertDownloadGizeh(url)
+        self.assertEqual(res.headers.get('Cache-Control', ''), 'no-cache, private')
+        res_etag = self.db_url_open(url, headers={'If-None-Match': res.headers['ETag']})
+        res_etag.raise_for_status()
+        self.assertEqual(res_etag.status_code, 304, "The admin should use its cache")

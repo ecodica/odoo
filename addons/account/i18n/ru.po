@@ -38,6 +38,7 @@
 # Wil Odoo, 2024
 # Смородин Даниил, 2024
 # Сергей Шебанин <sergey@shebanin.ru>, 2024
+# Nadia Martynova, 2024
 # 
 msgid ""
 msgstr ""
@@ -45,7 +46,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 13:31+0000\n"
 "PO-Revision-Date: 2022-09-22 05:44+0000\n"
-"Last-Translator: Сергей Шебанин <sergey@shebanin.ru>, 2024\n"
+"Last-Translator: Nadia Martynova, 2024\n"
 "Language-Team: Russian (https://app.transifex.com/odoo/teams/41243/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,9 +67,9 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Ход (%s) не сбалансирован.\n"
+"Движение средств (%s) не сбалансировано.\n"
 "Сумма дебетов равна %s, а сумма кредитов равна %s.\n"
-"Возможно, вы захотите указать счет по умолчанию в журнале \"%s\", чтобы автоматически балансировать каждый ход."
+"Возможно, вы захотите указать счет по умолчанию в журнале \"%s\", чтобы автоматически сбалансировать каждое движение средств."
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_tax__amount_type
@@ -413,8 +414,9 @@ msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_register_form
-msgid "<b>Early Payment Discount applied.</b>"
-msgstr "<b>Применяется скидка за раннюю оплату.</b>"
+msgid ""
+"<b>Early Payment Discount of %(payment_reference) has been applied.</b>"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
@@ -7838,10 +7840,10 @@ msgstr "Недействительный"
 #. odoo-python
 #: code:addons/account/models/partner.py:0
 #, python-format
-msgid "Invalid \"Zip Range\", please configure it properly."
+msgid ""
+"Invalid \"Zip Range\", You have to configure both \"From\" and \"To\" values"
+" for the zip range and \"To\" should be greater than \"From\"."
 msgstr ""
-"Недействительный \"Диапазон Почтового индекса\", пожалуйста, настройте его "
-"должным образом."
 
 #. module: account
 #. odoo-python
@@ -9648,6 +9650,12 @@ msgstr "Отрицательное значение поля суммы, есл�
 #: model:ir.model.fields.selection,name:account.selection__res_company__early_pay_discount_computation__excluded
 msgid "Never"
 msgstr "Никогда"
+
+#. module: account
+#: code:addons/account/models/account_tax.py:0
+#, python-format
+msgid "Nested group of taxes are not allowed."
+msgstr ""
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_setup_bank_manual_config__new_journal_name
@@ -14048,6 +14056,14 @@ msgid "The company this distribution line belongs to."
 msgstr "Компания, которой принадлежит эта линия распределения."
 
 #. module: account
+#: code:addons/account/models/partner.py:0
+#, python-format
+msgid ""
+"The country of the foreign VAT number could not be detected. Please assign a"
+" country to the fiscal position or set a country group"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,help:account.field_account_tax_group__country_id
 msgid "The country for which this tax group is applicable."
 msgstr "Страна, для которой применима данная налоговая группа."
@@ -16693,6 +16709,14 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/partner.py:0
+#, python-format
+msgid ""
+"You cannot create a fiscal position with a country outside of the selected "
+"country group."
+msgstr ""
+
+#. module: account
 #: code:addons/account/models/partner.py:0
 #, python-format
 msgid ""

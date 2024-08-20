@@ -272,6 +272,7 @@ class AccountReportLine(models.Model):
     domain_formula = fields.Char(string="Domain Formula Shortcut", help="Internal field to shorten expression_ids creation for the domain engine", inverse='_inverse_domain_formula', store=False)
     account_codes_formula = fields.Char(string="Account Codes Formula Shortcut", help="Internal field to shorten expression_ids creation for the account_codes engine", inverse='_inverse_account_codes_formula', store=False)
     aggregation_formula = fields.Char(string="Aggregation Formula Shortcut", help="Internal field to shorten expression_ids creation for the aggregation engine", inverse='_inverse_aggregation_formula', store=False)
+    tax_tags_formula = fields.Char(string="Tax Tags Formula Shortcut", help="Internal field to shorten expression_ids creation for the tax_tags engine", inverse='_inverse_aggregation_tax_formula', store=False)
 
     _sql_constraints = [
         ('code_uniq', 'unique (code)', "A report line with the same code already exists."),
@@ -361,6 +362,9 @@ class AccountReportLine(models.Model):
     def _inverse_aggregation_formula(self):
         self._create_report_expression(engine='aggregation')
 
+    def _inverse_aggregation_tax_formula(self):
+        self._create_report_expression(engine='tax_tags')
+
     def _inverse_account_codes_formula(self):
         self._create_report_expression(engine='account_codes')
 
@@ -378,6 +382,8 @@ class AccountReportLine(models.Model):
                 subformula, formula = None, report_line.account_codes_formula
             elif engine == 'aggregation' and report_line.aggregation_formula:
                 subformula, formula = None, report_line.aggregation_formula
+            elif engine == 'tax_tags' and report_line.tax_tags_formula:
+                subformula, formula = None, report_line.tax_tags_formula
             else:
                 # If we want to replace a formula shortcut with a full-syntax expression, we need to make the formula field falsy
                 # We can't simply remove it from the xml because it won't be updated
@@ -551,7 +557,12 @@ class AccountReportExpression(models.Model):
                     if former_tax_tags and all(tag_expr in self for tag_expr in former_tax_tags._get_related_tax_report_expressions()):
                         # If we're changing the formula of all the expressions using that tag, rename the tag
                         positive_tags, negative_tags = former_tax_tags.sorted(lambda x: x.tax_negate)
-                        positive_tags.name, negative_tags.name = f"+{vals['formula']}", f"-{vals['formula']}"
+                        if self.pool['account.tax'].name.translate:
+                            positive_tags._update_field_translations('name', {'en_US': f"+{vals['formula']}"})
+                            negative_tags._update_field_translations('name', {'en_US': f"-{vals['formula']}"})
+                        else:
+                            positive_tags.name = f"+{vals['formula']}"
+                            negative_tags.name = f"-{vals['formula']}"
                     else:
                         # Else, create a new tag. Its the compute functions will make sure it is properly linked to the expressions
                         tag_vals = self.env['account.report.expression']._get_tags_create_vals(vals['formula'], country.id)
@@ -571,7 +582,7 @@ class AccountReportExpression(models.Model):
         for tag in expressions_tags:
             other_expression_using_tag = self.env['account.report.expression'].sudo().search([
                 ('engine', '=', 'tax_tags'),
-                ('formula', '=', tag.name[1:]),  # we escape the +/- sign
+                ('formula', '=', tag.with_context(lang='en_US').name[1:]),  # we escape the +/- sign
                 ('report_line_id.report_id.country_id.id', '=', tag.country_id.id),
                 ('id', 'not in', self.ids),
             ], limit=1)
@@ -659,7 +670,7 @@ class AccountReportExpression(models.Model):
             country = tag_expression.report_line_id.report_id.country_id
             or_domains.append(self.env['account.account.tag']._get_tax_tags_domain(tag_expression.formula, country.id, sign))
 
-        return self.env['account.account.tag'].with_context(active_test=False).search(osv.expression.OR(or_domains))
+        return self.env['account.account.tag'].with_context(active_test=False, lang='en_US').search(osv.expression.OR(or_domains))
 
     @api.model
     def _get_tags_create_vals(self, tag_name, country_id, existing_tag=None):

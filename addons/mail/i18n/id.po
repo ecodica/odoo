@@ -2461,9 +2461,11 @@ msgstr "Perusahaan"
 
 #. module: mail
 #. odoo-javascript
+#. odoo-python
 #: code:addons/mail/static/src/js/activity.js:0
 #: code:addons/mail/static/src/models/composer_view.js:0
 #: code:addons/mail/static/src/models/mail_template.js:0
+#: code:addons/mail/wizard/mail_compose_message.py:0
 #: model:ir.actions.act_window,name:mail.action_email_compose_message_wizard
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 #, python-format
@@ -2927,7 +2929,7 @@ msgstr "Tipe Dekorasi"
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_message_subtype__default
 msgid "Default"
-msgstr "Baku"
+msgstr "Default"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_channel__default_display_mode
@@ -7790,7 +7792,7 @@ msgstr "Tanggal Dibaca"
 #: code:addons/mail/static/src/components/message/message.js:0
 #, python-format
 msgid "Read Less"
-msgstr ""
+msgstr "Baca Lebih Sedikit"
 
 #. module: mail
 #. odoo-javascript
@@ -9531,7 +9533,7 @@ msgstr "Action ini tidak dapat dilakukan pada model transient."
 #: code:addons/mail/static/src/xml/activity_view.xml:0
 #, python-format
 msgid "This action will send an email."
-msgstr ""
+msgstr "Action ini akan mengirim email."
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_partner_view_form_inherit_mail
