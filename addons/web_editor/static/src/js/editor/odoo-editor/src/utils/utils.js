@@ -1674,7 +1674,7 @@ export function isUnbreakable(node) {
 
 export function isUnremovable(node) {
     return (
-        (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.TEXT_NODE) ||
+        (node.nodeType !== Node.COMMENT_NODE && node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.TEXT_NODE) ||
         node.oid === 'root' ||
         (node.nodeType === Node.ELEMENT_NODE &&
             (node.classList.contains('o_editable') || node.getAttribute('t-set') || node.getAttribute('t-call'))) ||
@@ -3242,38 +3242,41 @@ export const isNotEditableNode = node =>
     node.getAttribute('contenteditable') &&
     node.getAttribute('contenteditable').toLowerCase() === 'false';
 
+export const isRoot = node => node.oid === "root";
+
 export const leftLeafFirstPath = createDOMPathGenerator(DIRECTIONS.LEFT);
 export const leftLeafOnlyNotBlockPath = createDOMPathGenerator(DIRECTIONS.LEFT, {
     leafOnly: true,
     stopTraverseFunction: isBlock,
-    stopFunction: isBlock,
+    stopFunction: node => isBlock(node) || isRoot(node),
 });
 export const leftLeafOnlyInScopeNotBlockEditablePath = createDOMPathGenerator(DIRECTIONS.LEFT, {
     leafOnly: true,
     inScope: true,
     stopTraverseFunction: node => isNotEditableNode(node) || isBlock(node),
-    stopFunction: node => isNotEditableNode(node) || isBlock(node),
+    stopFunction: node => isNotEditableNode(node) || isBlock(node) || isRoot(node),
 });
 
 export const rightLeafOnlyNotBlockPath = createDOMPathGenerator(DIRECTIONS.RIGHT, {
     leafOnly: true,
     stopTraverseFunction: isBlock,
-    stopFunction: isBlock,
+    stopFunction: node => isBlock(node) || isRoot(node),
 });
 
 export const rightLeafOnlyPathNotBlockNotEditablePath = createDOMPathGenerator(DIRECTIONS.RIGHT, {
     leafOnly: true,
+    stopFunction: node => isRoot(node),
 });
 export const rightLeafOnlyInScopeNotBlockEditablePath = createDOMPathGenerator(DIRECTIONS.RIGHT, {
     leafOnly: true,
     inScope: true,
     stopTraverseFunction: node => isNotEditableNode(node) || isBlock(node),
-    stopFunction: node => isNotEditableNode(node) || isBlock(node),
+    stopFunction: node => isNotEditableNode(node) || isBlock(node) || isRoot(node),
 });
 export const rightLeafOnlyNotBlockNotEditablePath = createDOMPathGenerator(DIRECTIONS.RIGHT, {
     leafOnly: true,
     stopTraverseFunction: node => isNotEditableNode(node) || isBlock(node),
-    stopFunction: node => isBlock(node) && !isNotEditableNode(node),
+    stopFunction: node => isBlock(node) && !isNotEditableNode(node) || isRoot(node),
 });
 //------------------------------------------------------------------------------
 // Miscelaneous
